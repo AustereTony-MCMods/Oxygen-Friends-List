@@ -1,0 +1,7 @@
+{
+  "main": {
+    "friend_request_expire_time_seconds": 30,
+    "max_friends": 20,
+    "max_ignored": 20
+  }
+}
