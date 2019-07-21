@@ -23,7 +23,7 @@ public class FriendsListGUIScreen extends AbstractGUIScreen {
 
     @Override
     protected GUIWorkspace initWorkspace() {
-        return new GUIWorkspace(this, 200, 202).setAlignment(EnumGUIAlignment.RIGHT, - 10, 0);
+        return new GUIWorkspace(this, 195, 202).setAlignment(EnumGUIAlignment.RIGHT, - 10, 0);
     }
 
     @Override

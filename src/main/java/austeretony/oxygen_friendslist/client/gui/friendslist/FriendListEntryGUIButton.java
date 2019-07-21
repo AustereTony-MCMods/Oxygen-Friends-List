@@ -2,7 +2,6 @@ package austeretony.oxygen_friendslist.client.gui.friendslist;
 
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
 import austeretony.oxygen.client.gui.PlayerGUIButton;
 import austeretony.oxygen.client.gui.settings.GUISettings;
@@ -10,6 +9,7 @@ import austeretony.oxygen.common.api.EnumDimension;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.SharedPlayerData;
+import austeretony.oxygen.util.OxygenUtils;
 import austeretony.oxygen_friendslist.common.main.FriendListEntry;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -30,34 +30,14 @@ public class FriendListEntryGUIButton extends PlayerGUIButton {
         this.listEntry = listEntry;
         SharedPlayerData sharedData;
         if (status != OxygenPlayerData.EnumActivityStatus.OFFLINE) {
-            this.setDisplayText(OxygenHelperClient.getSharedPlayerData(listEntry.playerUUID).getUsername());//need for search mechanic
-            this.dimension = EnumDimension.getLocalizedNameFromId(OxygenHelperClient.getPlayerDimension(listEntry.playerUUID));
+            sharedData = OxygenHelperClient.getSharedPlayerData(listEntry.playerUUID);
+            this.setDisplayText(sharedData.getUsername());//need for search mechanic
+            this.dimension = EnumDimension.getLocalizedNameFromId(OxygenHelperClient.getPlayerDimension(sharedData));
         } else {
             sharedData = OxygenHelperClient.getObservedSharedData(listEntry.playerUUID);
-            this.setDisplayText(sharedData.getUsername());//need for search mechanic
+            this.setDisplayText(sharedData.getUsername());
             this.dimension = EnumDimension.getLocalizedNameFromId(sharedData.getByte(OxygenMain.DIMENSION_SHARED_DATA_ID));
-            if (sharedData.getLastActivityTime() > 0L) {
-                int mode = 0;
-                long 
-                diff = System.currentTimeMillis() - sharedData.getLastActivityTime(),
-                hours = diff / 86_400_000L,
-                days;
-                if (hours >= 24L)
-                    mode = 1;               
-                if (mode == 0) {
-                    if (hours % 10L == 1L)
-                        this.lastActivity = ClientReference.localize("oxygen.lastActivity.hour", hours);
-                    else
-                        this.lastActivity = ClientReference.localize("oxygen.lastActivity.hours", hours);
-                } else {
-                    days = hours / 24L;
-                    if (days % 10L == 1L)
-                        this.lastActivity = ClientReference.localize("oxygen.lastActivity.day", days);
-                    else               
-                        this.lastActivity = ClientReference.localize("oxygen.lastActivity.days", days);
-                }
-            } else
-                this.lastActivity = ClientReference.localize("oxygen.lastActivity.noData");
+            this.lastActivity = OxygenUtils.getLastActivityTimeLocalizedString(sharedData.getLastActivityTime());
         }
         this.statusIconU = status.ordinal() * 3;
         this.hasNote = !listEntry.getNote().isEmpty();
@@ -69,7 +49,7 @@ public class FriendListEntryGUIButton extends PlayerGUIButton {
         this.statusImageLabel.setTextureUV(this.statusIconU, 0);
         if (this.lastActivity != null)
             this.statusImageLabel.initSimpleTooltip(this.lastActivity, GUISettings.instance().getTooltipScale());
-        this.noteImageLabel = new GUIImageLabel(this.getWidth() - 20, 1, 8, 8).setTexture(OxygenGUITextures.NOTE_ICONS, 8, 8, 0, 0, 24, 8).initScreen(this.getScreen()).initSimpleTooltip(this.listEntry.getNote(), GUISettings.instance().getTooltipScale());
+        this.noteImageLabel = new GUIImageLabel(this.getWidth() - 17, 1, 8, 8).setTexture(OxygenGUITextures.NOTE_ICONS, 8, 8, 0, 0, 24, 8).initScreen(this.getScreen()).initSimpleTooltip(this.listEntry.getNote(), GUISettings.instance().getTooltipScale());
     }
 
     @Override

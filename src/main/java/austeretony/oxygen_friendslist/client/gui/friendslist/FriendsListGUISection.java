@@ -135,7 +135,7 @@ public class FriendsListGUISection extends AbstractGUISection {
         this.addElement(this.autoAcceptButton = new GUICheckBoxButton(48, this.getHeight() - 9, 6).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
                 .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor()));
         this.addElement(this.autoAcceptTextLabel = new GUITextLabel(56, this.getHeight() - 10).setDisplayText(ClientReference.localize("oxygen.gui.friends.autoAccept"), false, GUISettings.instance().getSubTextScale()));
-        this.autoAcceptButton.setToggled(OxygenHelperClient.getClientSettingBoolean(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING));
+        this.autoAcceptButton.setToggled(OxygenHelperClient.getClientSettingBoolean(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID));
 
         //Protection
         if (!OxygenGUIHelper.isNeedSync(FriendsListMain.FRIEND_LIST_SCREEN_ID) || OxygenGUIHelper.isDataRecieved(FriendsListMain.FRIEND_LIST_SCREEN_ID))
@@ -189,7 +189,7 @@ public class FriendsListGUISection extends AbstractGUISection {
                         return entry2Status.ordinal() - entry1Status.ordinal();
                 }
             });
-        } else if (mode == 2 || mode == 3) {//by username: 2 - A -> z; 3 - vice versa.
+        } else {//by username: 2 - A -> z; 3 - vice versa.
             Collections.sort(players, new Comparator<FriendListEntry>() {
 
                 @Override
@@ -224,7 +224,7 @@ public class FriendsListGUISection extends AbstractGUISection {
 
         this.friendsPanel.getScroller().resetPosition();
         this.friendsPanel.getScroller().getSlider().reset();
-        
+
         this.searchField.reset();
 
         this.friendsOnlineTextLabel.setDisplayText(onlinePlayers + " / " + this.friends.size());
@@ -298,13 +298,11 @@ public class FriendsListGUISection extends AbstractGUISection {
             if (entry != this.currentEntry)
                 this.currentEntry = entry;
         } else if (element == this.autoAcceptButton) {
-            if (this.autoAcceptButton.isToggled()) {
-                OxygenHelperClient.setClientSetting(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING, true);
-                OxygenHelperClient.saveClientSettings();
-            } else {
-                OxygenHelperClient.setClientSetting(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING, false);
-                OxygenHelperClient.saveClientSettings();
-            }
+            if (this.autoAcceptButton.isToggled())
+                OxygenHelperClient.setClientSetting(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID, true);
+            else
+                OxygenHelperClient.setClientSetting(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID, false);
+            OxygenHelperClient.saveClientSettings();
         }
     }
 

@@ -29,7 +29,7 @@ public class FriendssListEventsClient {
     @SubscribeEvent
     public void onNotificationRecieved(OxygenNotificationRecievedEvent event) {
         if (event.notification.getIndex() == FriendsListMain.FRIEND_REQUEST_ID 
-                && OxygenHelperClient.getClientSettingBoolean(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING))
+                && OxygenHelperClient.getClientSettingBoolean(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID))
             event.notification.accepted(null);
     }
 

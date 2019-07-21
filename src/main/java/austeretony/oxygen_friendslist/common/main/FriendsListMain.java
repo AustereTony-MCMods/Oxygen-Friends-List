@@ -42,7 +42,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = FriendsListMain.MODID, 
         name = FriendsListMain.NAME, 
         version = FriendsListMain.VERSION,
-        dependencies = "required-after:oxygen@[0.7.0,);",//TODO Always check required Oxygen version before build
+        dependencies = "required-after:oxygen@[0.7.1,);",//TODO Always check required Oxygen version before build
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = FriendsListMain.VERSIONS_FORGE_URL)
 public class FriendsListMain {
@@ -50,7 +50,7 @@ public class FriendsListMain {
     public static final String 
     MODID = "oxygen_friendslist", 
     NAME = "Oxygen: Friends List", 
-    VERSION = "0.1.0", 
+    VERSION = "0.1.1", 
     VERSION_CUSTOM = VERSION + ":alpha:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Friends-List/info/mod_versions_forge.json";
@@ -67,7 +67,7 @@ public class FriendsListMain {
     FRIEND_LIST_SCREEN_ID = 60,
     IGNORE_LIST_SCREEN_ID = 61,
 
-    FRIEND_REQUESTS_AUTO_ACCEPT_SETTING = 60;
+    FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID = 60;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -108,7 +108,7 @@ public class FriendsListMain {
 
             OxygenHelperClient.registerNotificationIcon(FRIEND_REQUEST_ID, OxygenGUITextures.REQUEST_ICON);
 
-            OxygenHelperClient.registerClientSetting(FRIEND_REQUESTS_AUTO_ACCEPT_SETTING);
+            OxygenHelperClient.registerClientSetting(FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID);
         }
     }
 
