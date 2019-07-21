@@ -1,2 +1,5 @@
+0.1.1b
++Last activity time tooltip for offline players now shows correct time (displayed when you hover over the activity icon).
+
 0.1.0a
 +Initial release.

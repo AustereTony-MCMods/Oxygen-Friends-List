@@ -1,10 +1,10 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/oxygen-friends-list",
   "1.12.2": {
-    "0.1.0": "Initial release."
+    "0.1.1": "Last activity time tooltip for offline players now shows correct time."
   },
   "promos": {
-    "1.12.2-latest": "0.1.0",
-    "1.12.2-recommended": "0.1.0"
+    "1.12.2-latest": "0.1.1",
+    "1.12.2-recommended": "0.1.1"
   }
 }
