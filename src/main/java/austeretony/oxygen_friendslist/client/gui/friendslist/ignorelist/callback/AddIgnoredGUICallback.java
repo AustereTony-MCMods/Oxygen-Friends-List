@@ -1,27 +1,19 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
-import austeretony.oxygen.common.main.EnumOxygenPrivileges;
-import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.OxygenSoundEffects;
-import austeretony.oxygen.common.main.SharedPlayerData;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUIScreen;
 import austeretony.oxygen_friendslist.client.gui.friendslist.IgnoreListGUISection;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.AddFriendCallbackGUIFiller;
 
 public class AddIgnoredGUICallback extends AbstractGUICallback {
 
@@ -35,11 +27,9 @@ public class AddIgnoredGUICallback extends AbstractGUICallback {
 
     private GUIButton confirmButton, cancelButton;
 
-    private String 
+    private final String 
     playerFoundStr = ClientReference.localize("oxygen.gui.playerFound"),
     playerNotFoundStr = ClientReference.localize("oxygen.gui.playerNotFound");
-
-    private final Map<String, UUID> players = new HashMap<String, UUID>();
 
     public AddIgnoredGUICallback(FriendsListGUIScreen screen, IgnoreListGUISection section, int width, int height) {
         super(screen, section, width, height);
@@ -49,20 +39,13 @@ public class AddIgnoredGUICallback extends AbstractGUICallback {
 
     @Override
     public void init() {
-        for (SharedPlayerData sharedData : OxygenHelperClient.getSharedPlayersData())   
-            if (OxygenHelperClient.isOnline(sharedData.getPlayerUUID())
-                    && !FriendsListManagerClient.instance().getClientPlayerData().haveFriendListEntryForUUID(sharedData.getPlayerUUID())
-                    && (OxygenHelperClient.getPlayerStatus(sharedData) != OxygenPlayerData.EnumActivityStatus.OFFLINE || PrivilegeProviderClient.getPrivilegeValue(EnumOxygenPrivileges.EXPOSE_PLAYERS_OFFLINE.toString(), false)))
-                this.players.put(sharedData.getUsername(), sharedData.getPlayerUUID());
-        this.players.remove(OxygenHelperClient.getSharedClientPlayerData().getUsername());
-
-        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background 1st layer
-        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
-        this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("oxygen.gui.ignored.addIgnoredCallback"), true, GUISettings.instance().getTitleScale())); 
-        this.addElement(new GUITextLabel(2, 16).setDisplayText(ClientReference.localize("oxygen.gui.ignored.addIgnoredCallback.request"), false, GUISettings.instance().getTextScale()));  
+        this.addElement(new AddFriendCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("oxygen_friendslist.gui.ignored.addIgnoredCallback"), true, GUISettings.instance().getTitleScale())); 
+        this.addElement(new GUITextLabel(2, 16).setDisplayText(ClientReference.localize("oxygen_friendslist.gui.ignored.addIgnoredCallback.request"), false, GUISettings.instance().getTextScale()));  
         this.addElement(new GUITextLabel(2, 26).setDisplayText(ClientReference.localize("oxygen.gui.username"), false, GUISettings.instance().getSubTextScale()));  
-        this.addElement(this.usernameField = new GUITextField(2, 35, 187, 24).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());       
+        this.addElement(this.usernameField = new GUITextField(2, 35, 136, 9, 24).setTextScale(GUISettings.instance().getSubTextScale())
+                .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
+                .setLineOffset(3).cancelDraggedElementLogic());       
         this.addElement(this.playerStatusLabel = new GUITextLabel(2, 43).setTextScale(GUISettings.instance().getSubTextScale()).disableFull());    
 
         this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
@@ -84,7 +67,7 @@ public class AddIgnoredGUICallback extends AbstractGUICallback {
         if (this.usernameField.isDragged()) {
             if (!this.usernameField.getTypedText().isEmpty()) {
                 this.playerStatusLabel.enableFull();
-                if (this.players.containsKey(this.usernameField.getTypedText())) {
+                if (FriendsListManagerClient.isPlayerAvailable(this.usernameField.getTypedText())) {
                     this.playerStatusLabel.setDisplayText(this.playerFoundStr);
                     this.confirmButton.enable();
                 } else {
@@ -104,8 +87,8 @@ public class AddIgnoredGUICallback extends AbstractGUICallback {
         if (element == this.cancelButton)
             this.close();
         else if (element == this.confirmButton) {
-            if (this.players.containsKey(this.usernameField.getTypedText())) 
-                FriendsListManagerClient.instance().addToIgnoredSynced(this.players.get(this.usernameField.getTypedText()));
+            if (FriendsListManagerClient.isPlayerAvailable(this.usernameField.getTypedText())) 
+                FriendsListManagerClient.instance().addToIgnoredSynced(OxygenHelperClient.getSharedPlayerData(this.usernameField.getTypedText()).getPlayerUUID());
             this.section.sortPlayers(0);
             this.section.lockAddButton();
             this.close();

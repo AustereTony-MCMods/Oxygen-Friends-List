@@ -66,9 +66,9 @@ public class FriendRequest extends AbstractNotification {
         OxygenHelperServer.savePersistentDataDelegated(targetData);
 
         if (OxygenHelperServer.isOnline(this.senderUUID))
-            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.senderUUID), FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.FRIEND_REQUEST_ACCEPTED_SENDER.ordinal());
+            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.senderUUID), FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.FRIEND_REQUEST_ACCEPTED_SENDER.ordinal());
 
-        OxygenHelperServer.sendMessage(player, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.FRIEND_REQUEST_ACCEPTED_TARGET.ordinal());
+        OxygenHelperServer.sendMessage(player, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.FRIEND_REQUEST_ACCEPTED_TARGET.ordinal());
 
         OxygenHelperServer.setRequesting(this.senderUUID, false);
     }
@@ -76,8 +76,8 @@ public class FriendRequest extends AbstractNotification {
     @Override
     public void rejected(EntityPlayer player) {
         if (OxygenHelperServer.isOnline(this.senderUUID))
-            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.senderUUID), FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.FRIEND_REQUEST_REJECTED_SENDER.ordinal());
-        OxygenHelperServer.sendMessage(player, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.FRIEND_REQUEST_REJECTED_TARGET.ordinal());
+            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.senderUUID), FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.FRIEND_REQUEST_REJECTED_SENDER.ordinal());
+        OxygenHelperServer.sendMessage(player, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.FRIEND_REQUEST_REJECTED_TARGET.ordinal());
 
         OxygenHelperServer.setRequesting(this.senderUUID, false);
     }

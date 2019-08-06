@@ -1,25 +1,31 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist;
 
-import austeretony.alternateui.screen.core.AbstractGUIScreen;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.core.GUIWorkspace;
 import austeretony.alternateui.util.EnumGUIAlignment;
-import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.common.api.OxygenGUIHelper;
-import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
+import austeretony.oxygen.client.gui.SynchronizedGUIScreen;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import net.minecraft.util.ResourceLocation;
 
-public class FriendsListGUIScreen extends AbstractGUIScreen {
+public class FriendsListGUIScreen extends SynchronizedGUIScreen {
 
-    public static final ResourceLocation FRIEND_LIST_BACKGROUND_TEXTURE = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/background.png");
+    public static final ResourceLocation 
+    FRIENDS_LIST_MENU_BACKGROUND = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/friendslist_menu.png"),
+    SETTINGS_CALLBACK_BACKGROUND = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/settings_callback.png"),
+
+    ADD_FRIEND_CALLBACK_BACKGROUND = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/add_friend_callback.png"),
+    EDIT_NOTE_CALLBACK_BACKGROUND = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/edit_note_callback.png"),
+    IGNORE_CALLBACK_BACKGROUND = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/ignore_callback.png"),
+    REMOVE_FRIEND_CALLBACK_BACKGROUND = new ResourceLocation(FriendsListMain.MODID, "textures/gui/friendslist/remove_friend_callback.png");
 
     private FriendsListGUISection friendListSection;
 
     private IgnoreListGUISection ignoreListSection;
 
-    private boolean initialized;
+    public FriendsListGUIScreen() {
+        super(FriendsListMain.FRIENDS_LIST_MENU_SCREEN_ID);
+    }
 
     @Override
     protected GUIWorkspace initWorkspace() {
@@ -28,10 +34,8 @@ public class FriendsListGUIScreen extends AbstractGUIScreen {
 
     @Override
     protected void initSections() {
-        this.friendListSection = new FriendsListGUISection(this);
-        this.getWorkspace().initSection(this.friendListSection);     
-        this.ignoreListSection = new IgnoreListGUISection(this);  
-        this.getWorkspace().initSection(this.ignoreListSection);     
+        this.getWorkspace().initSection(this.friendListSection = new FriendsListGUISection(this));     
+        this.getWorkspace().initSection(this.ignoreListSection = new IgnoreListGUISection(this));     
     }
 
     @Override
@@ -48,26 +52,9 @@ public class FriendsListGUIScreen extends AbstractGUIScreen {
     }
 
     @Override
-    public void updateScreen() {    
-        super.updateScreen();
-        if (!this.initialized//reduce map calls
-                && OxygenGUIHelper.isNeedSync(FriendsListMain.FRIEND_LIST_SCREEN_ID)
-                && OxygenGUIHelper.isScreenInitialized(FriendsListMain.FRIEND_LIST_SCREEN_ID)
-                && OxygenGUIHelper.isDataRecieved(FriendsListMain.FRIEND_LIST_SCREEN_ID)) {
-            this.initialized = true;
-            OxygenGUIHelper.resetNeedSync(FriendsListMain.FRIEND_LIST_SCREEN_ID);
-            this.friendListSection.sortPlayers(0);
-            this.ignoreListSection.sortPlayers(0);
-        }
-    }
-
-    @Override
-    public void onGuiClosed() {
-        super.onGuiClosed();
-        OxygenGUIHelper.resetNeedSync(FriendsListMain.FRIEND_LIST_SCREEN_ID);
-        OxygenGUIHelper.resetScreenInitialized(FriendsListMain.FRIEND_LIST_SCREEN_ID);
-        OxygenGUIHelper.resetDataRecieved(FriendsListMain.FRIEND_LIST_SCREEN_ID);
-        OxygenHelperClient.savePersistentDataDelegated(FriendsListManagerClient.instance().getClientPlayerData());
+    public void loadData() {
+        this.friendListSection.sortPlayers(0);
+        this.ignoreListSection.sortPlayers(0);
     }
 
     public FriendsListGUISection getFriendListSection() {

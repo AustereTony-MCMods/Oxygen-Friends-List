@@ -2,7 +2,7 @@ package austeretony.oxygen_friendslist.common.event;
 
 import austeretony.oxygen.common.api.event.OxygenPlayerLoadedEvent;
 import austeretony.oxygen.common.api.event.OxygenPlayerUnloadedEvent;
-import austeretony.oxygen.common.api.event.OxygenWorldLoadedEvent;
+import austeretony.oxygen.common.api.event.OxygenPrivilegesLoadedEvent;
 import austeretony.oxygen_friendslist.common.FriendsListManagerServer;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class FriendsListEventsServer {
 
     @SubscribeEvent
-    public void onWorldLoaded(OxygenWorldLoadedEvent event) {        
+    public void onPrivilegesLoaded(OxygenPrivilegesLoadedEvent event) {        
         FriendsListMain.addDefaultPrivileges();
     }
 

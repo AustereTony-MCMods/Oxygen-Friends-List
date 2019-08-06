@@ -1,15 +1,11 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import austeretony.alternateui.screen.browsing.GUIScroller;
 import austeretony.alternateui.screen.button.GUIButton;
-import austeretony.alternateui.screen.button.GUICheckBoxButton;
 import austeretony.alternateui.screen.button.GUISlider;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
@@ -19,30 +15,30 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.list.GUIDropDownList;
 import austeretony.alternateui.screen.panel.GUIButtonPanel;
-import austeretony.alternateui.screen.panel.GUIButtonPanel.GUIEnumOrientation;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.alternateui.util.EnumGUIAlignment;
+import austeretony.alternateui.util.EnumGUIOrientation;
 import austeretony.oxygen.client.OxygenManagerClient;
+import austeretony.oxygen.client.api.OxygenGUIHelper;
 import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen.client.gui.IndexedGUIDropDownElement;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
-import austeretony.oxygen.client.gui.StatusGUIDropDownElement;
 import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.common.api.OxygenGUIHelper;
-import austeretony.oxygen.common.main.OxygenPlayerData;
+import austeretony.oxygen.common.main.OxygenPlayerData.EnumActivityStatus;
 import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen.util.MathUtils;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.FriendListBackgroundGUIFiller;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.callback.AddFriendGUICallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.callback.DownloadDataGUICallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.callback.EditNoteGUICallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.callback.IgnoreFriendGUICallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.callback.RemoveFriendGUICallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.context.EditNoteContextAction;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.context.IgnoreContextAction;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.context.RemoveFriendContextAction;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.FriendListGUIFiller;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.AddFriendGUICallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.EditNoteGUICallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.IgnoreGUICallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.RemoveFriendGUICallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.SettingsGUICallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context.EditNoteContextAction;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context.IgnoreContextAction;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context.RemoveFriendContextAction;
 import austeretony.oxygen_friendslist.client.input.FriendsListKeyHandler;
 import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
 import austeretony.oxygen_friendslist.common.main.FriendListEntry;
@@ -52,10 +48,8 @@ public class FriendsListGUISection extends AbstractGUISection {
 
     private final FriendsListGUIScreen screen;
 
-    private GUIButton ignoredPageButton, downloadButton, searchButton, refreshButton, addFriendButton, 
+    private GUIButton ignoredPageButton, settingsButton, searchButton, refreshButton, addFriendButton, 
     sortDownStatusButton, sortUpStatusButton, sortDownUsernameButton, sortUpUsernameButton;
-
-    private GUICheckBoxButton autoAcceptButton;
 
     private FriendListEntryGUIButton currentEntry;
 
@@ -67,13 +61,11 @@ public class FriendsListGUISection extends AbstractGUISection {
 
     private GUIDropDownList statusDropDownList;
 
-    private OxygenPlayerData.EnumActivityStatus currentStatus;
+    private EnumActivityStatus clientStatus;
 
     private GUIImageLabel statusImageLabel;
 
-    private AbstractGUICallback downloadCallback, addFriendCallback, removeCallback, ignoreCallback, editNoteCallback;
-
-    private final Set<FriendListEntry> friends = new HashSet<FriendListEntry>();
+    private AbstractGUICallback settingsCallback, addFriendCallback, removeCallback, ignoreCallback, editNoteCallback;
 
     public FriendsListGUISection(FriendsListGUIScreen screen) {
         super(screen);
@@ -82,13 +74,14 @@ public class FriendsListGUISection extends AbstractGUISection {
 
     @Override
     public void init() {
-        this.addElement(new FriendListBackgroundGUIFiller(0, 0, this.getWidth(), this.getHeight()));
-        String title = ClientReference.localize("oxygen.gui.friends.title");
+        this.addElement(new FriendListGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        String title = ClientReference.localize("oxygen_friendslist.gui.friends.title");
         this.addElement(new GUITextLabel(2, 4).setDisplayText(title, false, GUISettings.instance().getTitleScale()));
-        this.addElement(this.downloadButton = new GUIButton(this.textWidth(title, GUISettings.instance().getTitleScale()) + 4, 4, 8, 8).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.DOWNLOAD_ICONS, 8, 8).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.download"), GUISettings.instance().getTooltipScale()));
 
-        this.addElement(new GUIButton(this.getWidth() - 30, 0, 12, 12).setTexture(OxygenGUITextures.FRIENDS_ICONS, 12, 12).initSimpleTooltip(ClientReference.localize("oxygen.gui.friends.title"), GUISettings.instance().getTooltipScale()).toggle()); 
-        this.addElement(this.ignoredPageButton = new GUIButton(this.getWidth() - 15, 0, 12, 12).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.IGNORED_ICONS, 12, 12).initSimpleTooltip(ClientReference.localize("oxygen.gui.ignored.title"), GUISettings.instance().getTooltipScale())); 
+        this.addElement(new GUIButton(this.getWidth() - 32, 0, 12, 12).setTexture(OxygenGUITextures.FRIENDS_ICONS, 12, 12).initSimpleTooltip(ClientReference.localize("oxygen_friendslist.gui.friends.title"), GUISettings.instance().getTooltipScale()).toggle()); 
+        this.addElement(this.ignoredPageButton = new GUIButton(this.getWidth() - 18, 0, 12, 12).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.IGNORED_ICONS, 12, 12).initSimpleTooltip(ClientReference.localize("oxygen_friendslist.gui.ignored.title"), GUISettings.instance().getTooltipScale())); 
+
+        this.addElement(this.settingsButton = new GUIButton(this.getWidth() - 5, 0, 5, 5).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.TRIANGLE_TOP_RIGHT_CORNER_ICONS, 5, 5).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.settings"), GUISettings.instance().getTooltipScale()));
 
         this.addElement(this.searchButton = new GUIButton(4, 15, 7, 7).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SEARCH_ICONS, 7, 7).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.search"), GUISettings.instance().getTooltipScale()));         
         this.addElement(this.refreshButton = new GUIButton(79, 14, 10, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.REFRESH_ICONS, 9, 9).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));         
@@ -99,12 +92,14 @@ public class FriendsListGUISection extends AbstractGUISection {
         this.addElement(this.sortUpStatusButton = new GUIButton(7, 25, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
         this.addElement(this.sortDownUsernameButton = new GUIButton(19, 29, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
         this.addElement(this.sortUpUsernameButton = new GUIButton(19, 25, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
-        this.addElement(new GUITextLabel(24, 25).setDisplayText(ClientReference.localize("oxygen.gui.friends.username")).setTextScale(GUISettings.instance().getTextScale())); 
-        this.addElement(new GUITextLabel(100, 25).setDisplayText(ClientReference.localize("oxygen.gui.friends.dimension")).setTextScale(GUISettings.instance().getTextScale())); 
+        this.addElement(new GUITextLabel(24, 25).setDisplayText(ClientReference.localize("oxygen.gui.username")).setTextScale(GUISettings.instance().getSubTextScale())); 
+        this.addElement(new GUITextLabel(100, 25).setDisplayText(ClientReference.localize("oxygen.gui.dimension")).setTextScale(GUISettings.instance().getSubTextScale())); 
 
-        this.friendsPanel = new GUIButtonPanel(GUIEnumOrientation.VERTICAL, 0, 35, this.getWidth() - 3, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getPanelTextScale());
+        this.friendsPanel = new GUIButtonPanel(EnumGUIOrientation.VERTICAL, 0, 35, this.getWidth() - 3, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getPanelTextScale());
         this.addElement(this.friendsPanel);
-        this.addElement(this.searchField = new GUITextField(0, 15, 100, 20).setScale(0.7F).enableDynamicBackground().setDisplayText("...", false, GUISettings.instance().getTextScale()).disableFull().cancelDraggedElementLogic());
+        this.addElement(this.searchField = new GUITextField(0, 14, 76, 9, 20).setTextScale(GUISettings.instance().getSubTextScale())
+                .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
+                .setDisplayText("...").setLineOffset(3).disableFull().cancelDraggedElementLogic());
         this.friendsPanel.initSearchField(this.searchField);
         GUIScroller scroller = new GUIScroller(MathUtils.clamp(FriendsListConfig.MAX_FRIENDS.getIntValue(), 14, 100), 14);
         this.friendsPanel.initScroller(scroller);
@@ -123,7 +118,7 @@ public class FriendsListGUISection extends AbstractGUISection {
         menu.addElement(new EditNoteContextAction(this));
 
         //Support
-        for (AbstractContextAction action : OxygenGUIHelper.getContextActions(FriendsListMain.FRIEND_LIST_SCREEN_ID))
+        for (AbstractContextAction action : OxygenGUIHelper.getContextActions(FriendsListMain.FRIENDS_LIST_MENU_SCREEN_ID))
             menu.addElement(action);
 
         this.addElement(this.addFriendButton = new GUIButton(4, this.getHeight() - 11, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
@@ -132,24 +127,15 @@ public class FriendsListGUISection extends AbstractGUISection {
         this.lockAddButton();
         this.addElement(this.friendsAmountTextLabel = new GUITextLabel(0, this.getHeight() - 10).setTextScale(GUISettings.instance().getSubTextScale())); 
 
-        this.addElement(this.autoAcceptButton = new GUICheckBoxButton(48, this.getHeight() - 9, 6).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
-                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor()));
-        this.addElement(this.autoAcceptTextLabel = new GUITextLabel(56, this.getHeight() - 10).setDisplayText(ClientReference.localize("oxygen.gui.friends.autoAccept"), false, GUISettings.instance().getSubTextScale()));
-        this.autoAcceptButton.setToggled(OxygenHelperClient.getClientSettingBoolean(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID));
-
-        //Protection
-        if (!OxygenGUIHelper.isNeedSync(FriendsListMain.FRIEND_LIST_SCREEN_ID) || OxygenGUIHelper.isDataRecieved(FriendsListMain.FRIEND_LIST_SCREEN_ID))
-            this.sortPlayers(0);
-
-        this.currentStatus = OxygenHelperClient.getClientPlayerStatus();
+        this.clientStatus = OxygenHelperClient.getClientPlayerStatus();
         int statusOffset = this.playerNameTextLabel.getX() + this.textWidth(this.playerNameTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale());
-        this.addElement(this.statusImageLabel = new GUIImageLabel(statusOffset + 4, 17).setTexture(OxygenGUITextures.STATUS_ICONS, 3, 3, this.currentStatus.ordinal() * 3, 0, 12, 3));   
-        this.statusDropDownList = new GUIDropDownList(statusOffset + 10, 16, GUISettings.instance().getDropDownListWidth(), 10).setScale(GUISettings.instance().getDropDownListScale()).setDisplayText(this.currentStatus.localizedName()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 1);
+        this.addElement(this.statusImageLabel = new GUIImageLabel(statusOffset + 4, 17).setTexture(OxygenGUITextures.STATUS_ICONS, 3, 3, this.clientStatus.ordinal() * 3, 0, 12, 3));   
+        this.statusDropDownList = new GUIDropDownList(statusOffset + 10, 16, GUISettings.instance().getDropDownListWidth(), 10).setScale(GUISettings.instance().getDropDownListScale()).setDisplayText(this.clientStatus.localizedName()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 1);
         this.statusDropDownList.setOpenSound(OxygenSoundEffects.DROP_DOWN_LIST_OPEN.soundEvent);
         this.statusDropDownList.setCloseSound(OxygenSoundEffects.CONTEXT_CLOSE.soundEvent);
-        StatusGUIDropDownElement profileElement;
-        for (OxygenPlayerData.EnumActivityStatus status : OxygenPlayerData.EnumActivityStatus.values()) {
-            profileElement = new StatusGUIDropDownElement(status);
+        IndexedGUIDropDownElement<EnumActivityStatus> profileElement;
+        for (EnumActivityStatus status : EnumActivityStatus.values()) {
+            profileElement = new IndexedGUIDropDownElement(status);
             profileElement.setDisplayText(status.localizedName());
             profileElement.enableDynamicBackground(GUISettings.instance().getEnabledContextActionColor(), GUISettings.instance().getDisabledContextActionColor(), GUISettings.instance().getHoveredContextActionColor());
             profileElement.setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
@@ -157,63 +143,38 @@ public class FriendsListGUISection extends AbstractGUISection {
         }
         this.addElement(this.statusDropDownList);   
 
-        this.downloadCallback = new DownloadDataGUICallback(this.screen, this, 140, 40).enableDefaultBackground();
+        this.settingsCallback = new SettingsGUICallback(this.screen, this, 140, 38).enableDefaultBackground();
+
         this.addFriendCallback = new AddFriendGUICallback(this.screen, this, 140, 68).enableDefaultBackground();
         this.removeCallback = new RemoveFriendGUICallback(this.screen, this, 140, 48).enableDefaultBackground();
-        this.ignoreCallback = new IgnoreFriendGUICallback(this.screen, this, 140, 48).enableDefaultBackground();
+        this.ignoreCallback = new IgnoreGUICallback(this.screen, this, 140, 48).enableDefaultBackground();
         this.editNoteCallback = new EditNoteGUICallback(this.screen, this, 140, 50).enableDefaultBackground();          
     }
 
     public void sortPlayers(int mode) {
-        this.friends.clear();
-        for (FriendListEntry listEntry : FriendsListManagerClient.instance().getClientPlayerData().getFriendListEntries())
-            if (!listEntry.ignored)
-                this.friends.add(listEntry);
+        List<FriendListEntry> friends = FriendsListManagerClient.instance().getClientPlayerData().getFriendListEntries()
+                .stream()
+                .filter(e->!e.ignored)
+                .collect(Collectors.toList());
 
-        List<FriendListEntry> players = new ArrayList<FriendListEntry>(this.friends);
-        if (mode == 0 || mode == 1) {//by status: 0 - online -> offline; 1 - vice versa.
-            Collections.sort(players, new Comparator<FriendListEntry>() {
-
-                @Override
-                public int compare(FriendListEntry entry1, FriendListEntry entry2) {
-                    OxygenPlayerData.EnumActivityStatus 
-                    entry1Status = OxygenPlayerData.EnumActivityStatus.OFFLINE,
-                    entry2Status = OxygenPlayerData.EnumActivityStatus.OFFLINE;
-                    if (OxygenHelperClient.isOnline(entry1.playerUUID))
-                        entry1Status = OxygenHelperClient.getPlayerStatus(entry1.playerUUID);
-                    if (OxygenHelperClient.isOnline(entry2.playerUUID))
-                        entry2Status = OxygenHelperClient.getPlayerStatus(entry2.playerUUID);
-                    if (mode == 0)
-                        return entry1Status.ordinal() - entry2Status.ordinal();
-                    else
-                        return entry2Status.ordinal() - entry1Status.ordinal();
-                }
-            });
-        } else {//by username: 2 - A -> z; 3 - vice versa.
-            Collections.sort(players, new Comparator<FriendListEntry>() {
-
-                @Override
-                public int compare(FriendListEntry entry1, FriendListEntry entry2) {
-                    String 
-                    username1 = OxygenHelperClient.getObservedSharedData(entry1.playerUUID).getUsername(), 
-                    username2 = OxygenHelperClient.getObservedSharedData(entry2.playerUUID).getUsername();
-                    if (mode == 2)
-                        return username1.compareTo(username2);
-                    else
-                        return username2.compareTo(username1);
-                }
-            });
-        }
+        if (mode == 0)
+            Collections.sort(friends, (f1, f2)->FriendsListManagerClient.getActivityStatus(f1).ordinal() - FriendsListManagerClient.getActivityStatus(f2).ordinal());
+        else if (mode == 1)
+            Collections.sort(friends, (f1, f2)->FriendsListManagerClient.getActivityStatus(f2).ordinal() - FriendsListManagerClient.getActivityStatus(f1).ordinal());
+        else if (mode == 2)
+            Collections.sort(friends, (f1, f2)->FriendsListManagerClient.getUsername(f1).compareTo(FriendsListManagerClient.getUsername(f2)));
+        else if (mode == 3)
+            Collections.sort(friends, (f1, f2)->FriendsListManagerClient.getUsername(f2).compareTo(FriendsListManagerClient.getUsername(f1)));
 
         this.friendsPanel.reset();
         FriendListEntryGUIButton button;
         int onlinePlayers = 0;
-        OxygenPlayerData.EnumActivityStatus status;
-        for (FriendListEntry entry : players) {     
-            status = OxygenPlayerData.EnumActivityStatus.OFFLINE;
+        EnumActivityStatus status;
+        for (FriendListEntry entry : friends) {     
+            status = EnumActivityStatus.OFFLINE;
             if (OxygenHelperClient.isOnline(entry.playerUUID)) {
                 status = OxygenHelperClient.getPlayerStatus(entry.playerUUID);
-                if (status != OxygenPlayerData.EnumActivityStatus.OFFLINE)
+                if (status != EnumActivityStatus.OFFLINE)
                     onlinePlayers++;
             }
             button = new FriendListEntryGUIButton(entry, status);
@@ -227,9 +188,9 @@ public class FriendsListGUISection extends AbstractGUISection {
 
         this.searchField.reset();
 
-        this.friendsOnlineTextLabel.setDisplayText(onlinePlayers + " / " + this.friends.size());
+        this.friendsOnlineTextLabel.setDisplayText(onlinePlayers + " / " + friends.size());
         this.friendsOnlineTextLabel.setX(this.getWidth() - 4 - this.textWidth(this.friendsOnlineTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
-        this.friendsAmountTextLabel.setDisplayText(this.friends.size() + " / " + FriendsListConfig.MAX_FRIENDS.getIntValue());
+        this.friendsAmountTextLabel.setDisplayText(friends.size() + " / " + FriendsListConfig.MAX_FRIENDS.getIntValue());
         this.friendsAmountTextLabel.setX(this.getWidth() - 4 - this.textWidth(this.friendsAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
 
         this.sortUpStatusButton.toggle();
@@ -240,82 +201,83 @@ public class FriendsListGUISection extends AbstractGUISection {
 
     @Override
     public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
-        if (element == this.ignoredPageButton)
-            this.screen.getIgnoreListSection().open();
-        else if (element == this.downloadButton)
-            this.downloadCallback.open();
-        else if (element == this.searchButton)
-            this.searchField.enableFull();
-        else if (element == this.refreshButton)
-            this.sortPlayers(0);
-        else if (element == this.sortDownStatusButton) {
-            if (!this.sortDownStatusButton.isToggled()) {
-                this.sortPlayers(1);
-                this.sortUpStatusButton.setToggled(false);
-                this.sortDownStatusButton.toggle(); 
-
-                this.sortDownUsernameButton.setToggled(false);
-                this.sortUpUsernameButton.setToggled(false);
-            }
-        } else if (element == this.sortUpStatusButton) {
-            if (!this.sortUpStatusButton.isToggled()) {
+        if (mouseButton == 0) {
+            if (element == this.ignoredPageButton)
+                this.screen.getIgnoreListSection().open();
+            else if (element == this.settingsButton)
+                this.settingsCallback.open();
+            else if (element == this.searchButton) {
+                this.searchField.enableFull();
+                this.searchButton.setHovered(false);
+                this.searchButton.disableFull();
+            } else if (element == this.refreshButton)
                 this.sortPlayers(0);
-                this.sortDownStatusButton.setToggled(false);
-                this.sortUpStatusButton.toggle();
+            else if (element == this.sortDownStatusButton) {
+                if (!this.sortDownStatusButton.isToggled()) {
+                    this.sortPlayers(1);
+                    this.sortUpStatusButton.setToggled(false);
+                    this.sortDownStatusButton.toggle(); 
 
-                this.sortDownUsernameButton.setToggled(false);
-                this.sortUpUsernameButton.setToggled(false);
-            }
-        } else if (element == this.sortDownUsernameButton) {
-            if (!this.sortDownUsernameButton.isToggled()) {
-                this.sortPlayers(3);
-                this.sortUpUsernameButton.setToggled(false);
-                this.sortDownUsernameButton.toggle(); 
+                    this.sortDownUsernameButton.setToggled(false);
+                    this.sortUpUsernameButton.setToggled(false);
+                }
+            } else if (element == this.sortUpStatusButton) {
+                if (!this.sortUpStatusButton.isToggled()) {
+                    this.sortPlayers(0);
+                    this.sortDownStatusButton.setToggled(false);
+                    this.sortUpStatusButton.toggle();
 
-                this.sortDownStatusButton.setToggled(false);
-                this.sortUpStatusButton.setToggled(false);
-            }
-        } else if (element == this.sortUpUsernameButton) {
-            if (!this.sortUpUsernameButton.isToggled()) {
-                this.sortPlayers(2);
-                this.sortDownUsernameButton.setToggled(false);
-                this.sortUpUsernameButton.toggle();
+                    this.sortDownUsernameButton.setToggled(false);
+                    this.sortUpUsernameButton.setToggled(false);
+                }
+            } else if (element == this.sortDownUsernameButton) {
+                if (!this.sortDownUsernameButton.isToggled()) {
+                    this.sortPlayers(3);
+                    this.sortUpUsernameButton.setToggled(false);
+                    this.sortDownUsernameButton.toggle(); 
 
-                this.sortDownStatusButton.setToggled(false);
-                this.sortUpStatusButton.setToggled(false);
+                    this.sortDownStatusButton.setToggled(false);
+                    this.sortUpStatusButton.setToggled(false);
+                }
+            } else if (element == this.sortUpUsernameButton) {
+                if (!this.sortUpUsernameButton.isToggled()) {
+                    this.sortPlayers(2);
+                    this.sortDownUsernameButton.setToggled(false);
+                    this.sortUpUsernameButton.toggle();
+
+                    this.sortDownStatusButton.setToggled(false);
+                    this.sortUpStatusButton.setToggled(false);
+                }
+            } else if (element == this.addFriendButton)
+                this.addFriendCallback.open();
+            else if (element instanceof IndexedGUIDropDownElement) {
+                IndexedGUIDropDownElement<EnumActivityStatus> profileButton = (IndexedGUIDropDownElement) element;
+                if (profileButton.index != this.clientStatus) {
+                    OxygenManagerClient.instance().changeActivityStatusSynced(profileButton.index);
+                    this.clientStatus = profileButton.index;
+                    this.statusImageLabel.setTextureUV(this.clientStatus.ordinal() * 3, 0);
+                }
             }
-        } else if (element == this.addFriendButton)
-            this.addFriendCallback.open();
-        else if (element instanceof StatusGUIDropDownElement) {
-            StatusGUIDropDownElement profileButton = (StatusGUIDropDownElement) element;
-            if (profileButton.status != this.currentStatus) {
-                OxygenManagerClient.instance().changeActivityStatusSynced(profileButton.status);
-                this.currentStatus = profileButton.status;
-                this.statusImageLabel.setTextureUV(this.currentStatus.ordinal() * 3, 0);
-            }
-        } else if (element instanceof FriendListEntryGUIButton) {
+        }
+        if (element instanceof FriendListEntryGUIButton) {
             FriendListEntryGUIButton entry = (FriendListEntryGUIButton) element;
             if (entry != this.currentEntry)
                 this.currentEntry = entry;
-        } else if (element == this.autoAcceptButton) {
-            if (this.autoAcceptButton.isToggled())
-                OxygenHelperClient.setClientSetting(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID, true);
-            else
-                OxygenHelperClient.setClientSetting(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID, false);
-            OxygenHelperClient.saveClientSettings();
         }
     }
 
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (this.searchField.isEnabled() && !this.searchField.isHovered())
+        if (this.searchField.isEnabled() && !this.searchField.isHovered()) {
+            this.searchButton.enableFull();
             this.searchField.disableFull();
+        }
         return super.mouseClicked(mouseX, mouseY, mouseButton);              
     }
 
     @Override
     public boolean keyTyped(char typedChar, int keyCode) {   
-        if (keyCode == FriendsListKeyHandler.FRIENDS_LIST_MENU.getKeyCode() && !this.searchField.isDragged() && !this.hasCurrentCallback())
+        if (keyCode == FriendsListKeyHandler.FRIENDS_LIST.getKeyCode() && !this.searchField.isDragged() && !this.hasCurrentCallback())
             this.screen.close();
         return super.keyTyped(typedChar, keyCode); 
     }

@@ -1,10 +1,9 @@
-package austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.callback;
+package austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback;
 
 import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.text.GUITextBoxLabel;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.core.api.ClientReference;
@@ -32,10 +31,8 @@ public class RemoveFriendGUICallback extends AbstractGUICallback {
 
     @Override
     public void init() {
-        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background 1st layer
-        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
-        this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("oxygen.gui.friends.removeFriendCallback"), true, GUISettings.instance().getTitleScale()));
+        this.addElement(new RemoveFriendCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("oxygen_friendslist.gui.friends.removeFriendCallback"), true, GUISettings.instance().getTitleScale()));
         this.addElement(this.requestLabel = new GUITextBoxLabel(2, 16, 160, 20));     
 
         this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
@@ -44,7 +41,7 @@ public class RemoveFriendGUICallback extends AbstractGUICallback {
 
     @Override
     protected void onOpen() {
-        this.requestLabel.setDisplayText(ClientReference.localize("oxygen.gui.friends.removeFriendCallback.request", this.section.getCurrentEntry().getDisplayText()), false, GUISettings.instance().getTextScale());
+        this.requestLabel.setDisplayText(ClientReference.localize("oxygen_friendslist.gui.friends.removeFriendCallback.request", this.section.getCurrentEntry().getDisplayText()), false, GUISettings.instance().getTextScale());
     }
 
     @Override

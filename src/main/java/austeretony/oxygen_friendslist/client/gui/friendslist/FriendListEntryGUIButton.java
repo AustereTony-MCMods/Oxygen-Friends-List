@@ -1,19 +1,22 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist;
 
+import java.util.UUID;
+
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.oxygen.client.api.OxygenHelperClient;
+import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen.client.gui.IndexedGUIButton;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
-import austeretony.oxygen.client.gui.PlayerGUIButton;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.EnumDimension;
 import austeretony.oxygen.common.main.OxygenMain;
-import austeretony.oxygen.common.main.OxygenPlayerData;
+import austeretony.oxygen.common.main.OxygenPlayerData.EnumActivityStatus;
 import austeretony.oxygen.common.main.SharedPlayerData;
 import austeretony.oxygen.util.OxygenUtils;
 import austeretony.oxygen_friendslist.common.main.FriendListEntry;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class FriendListEntryGUIButton extends PlayerGUIButton {
+public class FriendListEntryGUIButton extends IndexedGUIButton<UUID> {
 
     public final FriendListEntry listEntry;
 
@@ -25,11 +28,11 @@ public class FriendListEntryGUIButton extends PlayerGUIButton {
 
     private boolean hasNote;
 
-    public FriendListEntryGUIButton(FriendListEntry listEntry, OxygenPlayerData.EnumActivityStatus status) {
+    public FriendListEntryGUIButton(FriendListEntry listEntry, EnumActivityStatus status) {
         super(listEntry.playerUUID);
         this.listEntry = listEntry;
         SharedPlayerData sharedData;
-        if (status != OxygenPlayerData.EnumActivityStatus.OFFLINE) {
+        if (status != EnumActivityStatus.OFFLINE) {
             sharedData = OxygenHelperClient.getSharedPlayerData(listEntry.playerUUID);
             this.setDisplayText(sharedData.getUsername());//need for search mechanic
             this.dimension = EnumDimension.getLocalizedNameFromId(OxygenHelperClient.getPlayerDimension(sharedData));
@@ -37,7 +40,7 @@ public class FriendListEntryGUIButton extends PlayerGUIButton {
             sharedData = OxygenHelperClient.getObservedSharedData(listEntry.playerUUID);
             this.setDisplayText(sharedData.getUsername());
             this.dimension = EnumDimension.getLocalizedNameFromId(sharedData.getByte(OxygenMain.DIMENSION_SHARED_DATA_ID));
-            this.lastActivity = OxygenUtils.getLastActivityTimeLocalizedString(sharedData.getLastActivityTime());
+            this.lastActivity = ClientReference.localize("oxygen.gui.lastActivityTime", OxygenUtils.getTimePassedLocalizedString(sharedData.getLastActivityTime()));
         }
         this.statusIconU = status.ordinal() * 3;
         this.hasNote = !listEntry.getNote().isEmpty();

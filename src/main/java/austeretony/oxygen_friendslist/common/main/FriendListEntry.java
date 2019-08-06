@@ -14,7 +14,7 @@ public class FriendListEntry {
 
     public static final int MAX_NOTE_LENGTH = 40;
 
-    private long id;
+    private long entryId;
 
     public final UUID playerUUID;
 
@@ -29,16 +29,16 @@ public class FriendListEntry {
     }
 
     public long getId() {
-        return this.id;
+        return this.entryId;
     }
 
     public FriendListEntry createId() {
-        this.id = OxygenUtils.createDataStampedId();
+        this.entryId = OxygenUtils.createDataStampedId();
         return this;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setId(long entryId) {
+        this.entryId = entryId;
     }
 
     public String getNote() {
@@ -52,7 +52,7 @@ public class FriendListEntry {
     public void write(BufferedOutputStream bos) throws IOException {
         StreamUtils.write(this.playerUUID, bos);
         StreamUtils.write(this.ignored, bos);
-        StreamUtils.write(this.id, bos);
+        StreamUtils.write(this.entryId, bos);
         StreamUtils.write(this.note, bos);
     }
 
@@ -66,7 +66,7 @@ public class FriendListEntry {
     public void write(PacketBuffer buffer) {
         PacketBufferUtils.writeUUID(this.playerUUID, buffer);
         buffer.writeBoolean(this.ignored);
-        buffer.writeLong(this.id);
+        buffer.writeLong(this.entryId);
         PacketBufferUtils.writeString(this.note, buffer);
     }
 

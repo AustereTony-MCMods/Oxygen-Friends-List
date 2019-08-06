@@ -1,6 +1,6 @@
 package austeretony.oxygen_friendslist.common.config;
 
-import java.util.Queue;
+import java.util.List;
 
 import austeretony.oxygen.common.api.config.AbstractConfigHolder;
 import austeretony.oxygen.common.api.config.ConfigValue;
@@ -35,7 +35,7 @@ public class FriendsListConfig extends AbstractConfigHolder {
     }
 
     @Override
-    public void getValues(Queue<ConfigValue> values) {
+    public void getValues(List<ConfigValue> values) {
         values.add(FRIEND_REQUEST_EXPIRE_TIME);
         values.add(MAX_FRIENDS);
         values.add(MAX_IGNORED);

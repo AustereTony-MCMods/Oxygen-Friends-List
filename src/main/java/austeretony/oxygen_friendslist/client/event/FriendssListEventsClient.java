@@ -6,7 +6,7 @@ import austeretony.oxygen.client.api.event.OxygenClientInitEvent;
 import austeretony.oxygen.client.api.event.OxygenNotificationRecievedEvent;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
-import austeretony.oxygen_friendslist.common.main.EnumFriendsListChatMessages;
+import austeretony.oxygen_friendslist.common.main.EnumFriendsListChatMessage;
 import austeretony.oxygen_friendslist.common.main.FriendListEntry;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import net.minecraft.util.text.ChatType;
@@ -23,7 +23,7 @@ public class FriendssListEventsClient {
     @SubscribeEvent
     public void onChatMessage(OxygenChatMessageEvent event) {
         if (event.modIndex == FriendsListMain.FRIENDS_LIST_MOD_INDEX)
-            EnumFriendsListChatMessages.values()[event.messageIndex].show(event.args);
+            EnumFriendsListChatMessage.values()[event.messageIndex].show(event.args);
     }
 
     @SubscribeEvent

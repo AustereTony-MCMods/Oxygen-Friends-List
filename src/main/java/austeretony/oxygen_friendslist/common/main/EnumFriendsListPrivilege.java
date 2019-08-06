@@ -2,13 +2,13 @@ package austeretony.oxygen_friendslist.common.main;
 
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 
-public enum EnumFriendsListPrivileges {
+public enum EnumFriendsListPrivilege {
 
     PREVENT_IGNORE(":preventIgnore");
 
     private final String name;
 
-    EnumFriendsListPrivileges(String name) {
+    EnumFriendsListPrivilege(String name) {
         this.name = name;
         PrivilegeProviderServer.registerPrivilege(FriendsListMain.MODID + name, FriendsListMain.NAME);
     }

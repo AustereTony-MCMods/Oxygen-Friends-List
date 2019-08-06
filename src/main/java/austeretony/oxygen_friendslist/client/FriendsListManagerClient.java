@@ -3,13 +3,15 @@ package austeretony.oxygen_friendslist.client;
 import java.util.UUID;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUIScreen;
+import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
+import austeretony.oxygen.common.main.EnumOxygenPrivilege;
+import austeretony.oxygen.common.main.OxygenPlayerData;
+import austeretony.oxygen.common.main.OxygenPlayerData.EnumActivityStatus;
+import austeretony.oxygen.common.main.SharedPlayerData;
 import austeretony.oxygen_friendslist.common.main.FriendListEntry;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import austeretony.oxygen_friendslist.common.main.FriendsListPlayerData;
 import austeretony.oxygen_friendslist.common.network.server.SPEditFriendListEntryNote;
-import austeretony.oxygen_friendslist.common.network.server.SPFriendsListRequest;
 import austeretony.oxygen_friendslist.common.network.server.SPManageFriendList;
 
 public class FriendsListManagerClient {
@@ -35,29 +37,6 @@ public class FriendsListManagerClient {
 
     public FriendsListPlayerData getClientPlayerData() {
         return this.playerData;
-    }
-
-    public void openFriendsListSynced() {
-        FriendsListMain.network().sendToServer(new SPFriendsListRequest(SPFriendsListRequest.EnumRequest.OPEN_FRIENDS_LIST));
-    }
-
-    public void openFriendsListDelegated() {
-        ClientReference.getMinecraft().addScheduledTask(new Runnable() {
-
-            @Override
-            public void run() {
-                openFriendsList();
-            }
-        });
-    }
-
-    private void openFriendsList() {
-        ClientReference.displayGuiScreen(new FriendsListGUIScreen());
-    }
-
-    public void downloadFriendsListDataSynced() {
-        this.getClientPlayerData().clearFriendListEntries();
-        this.openFriendsListSynced();
     }
 
     public void sendFriendRequestSynced(UUID playerUUID) {
@@ -86,6 +65,29 @@ public class FriendsListManagerClient {
         this.getClientPlayerData().removeFriendListEntry(playerUUID);
         FriendsListMain.network().sendToServer(new SPManageFriendList(SPManageFriendList.EnumAction.REMOVE_IGNORED, playerUUID));
         OxygenHelperClient.savePersistentDataDelegated(this.getClientPlayerData());
+    }
+
+    public static EnumActivityStatus getActivityStatus(FriendListEntry entry) {
+        EnumActivityStatus activityStatus = EnumActivityStatus.OFFLINE;
+        if (OxygenHelperClient.isOnline(entry.playerUUID))
+            activityStatus = OxygenHelperClient.getPlayerStatus(entry.playerUUID);
+        return activityStatus;
+    }
+
+    public static String getUsername(FriendListEntry entry) {
+        return OxygenHelperClient.getObservedSharedData(entry.playerUUID).getUsername();
+    }
+
+    public static boolean isPlayerAvailable(String username) {
+        if (username.equals(OxygenHelperClient.getSharedClientPlayerData().getUsername()))
+            return false;
+        SharedPlayerData sharedData = OxygenHelperClient.getSharedPlayerData(username);
+        if (sharedData != null) {
+            if (!FriendsListManagerClient.instance().getClientPlayerData().haveFriendListEntryForUUID(sharedData.getPlayerUUID())
+                    && (OxygenHelperClient.getPlayerStatus(sharedData) != OxygenPlayerData.EnumActivityStatus.OFFLINE || PrivilegeProviderClient.getPrivilegeValue(EnumOxygenPrivilege.EXPOSE_PLAYERS_OFFLINE.toString(), false)))
+                return true;
+        }
+        return false;
     }
 
     public void reset() {

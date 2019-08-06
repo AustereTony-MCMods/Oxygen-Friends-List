@@ -7,12 +7,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
-import austeretony.oxygen.common.main.EnumOxygenChatMessages;
+import austeretony.oxygen.common.main.EnumOxygenChatMessage;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
-import austeretony.oxygen_friendslist.common.main.EnumFriendsListChatMessages;
-import austeretony.oxygen_friendslist.common.main.EnumFriendsListPrivileges;
+import austeretony.oxygen_friendslist.common.main.EnumFriendsListChatMessage;
+import austeretony.oxygen_friendslist.common.main.EnumFriendsListPrivilege;
 import austeretony.oxygen_friendslist.common.main.FriendListEntry;
 import austeretony.oxygen_friendslist.common.main.FriendRequest;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
@@ -65,7 +65,7 @@ public class FriendsListManagerServer {
                 OxygenHelperServer.sendRequest(sender, CommonReference.playerByUUID(targetUUID), 
                         new FriendRequest(FriendsListMain.FRIEND_REQUEST_ID, senderUUID, CommonReference.getName(sender)), true);
             } else
-                OxygenHelperServer.sendMessage(sender, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessages.REQUEST_RESET.ordinal());
+                OxygenHelperServer.sendMessage(sender, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessage.REQUEST_RESET.ordinal());
         }
     }
 
@@ -88,7 +88,7 @@ public class FriendsListManagerServer {
                 OxygenHelperServer.removeObservedPlayer(targetUUID, senderUUID, true);
                 OxygenHelperServer.savePersistentDataDelegated(senderData);
                 OxygenHelperServer.savePersistentDataDelegated(targetData); 
-                OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.FRIEND_REMOVED.ordinal());
+                OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.FRIEND_REMOVED.ordinal());
             }
         }
     }
@@ -101,14 +101,14 @@ public class FriendsListManagerServer {
             FriendsListPlayerData playerData = this.getPlayerData(senderUUID);
             playerData.getFriendListEntryByUUID(targetUUID).setNote(note);
             OxygenHelperServer.savePersistentDataDelegated(playerData);
-            OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.NOTE_EDITED.ordinal());
+            OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.NOTE_EDITED.ordinal());
         }
     }
 
     public void addToIgnored(EntityPlayerMP playerMP, UUID targetUUID) {
         UUID senderUUID = CommonReference.getPersistentUUID(playerMP);
         if (!senderUUID.equals(targetUUID)
-                && !PrivilegeProviderServer.getPrivilegeValue(targetUUID, EnumFriendsListPrivileges.PREVENT_IGNORE.toString(), false)
+                && !PrivilegeProviderServer.getPrivilegeValue(targetUUID, EnumFriendsListPrivilege.PREVENT_IGNORE.toString(), false)
                 && OxygenHelperServer.isOnline(targetUUID)) {
             FriendsListPlayerData senderData = this.getPlayerData(senderUUID);
             if (senderData.getIgnoredAmount() < FriendsListConfig.MAX_IGNORED.getIntValue() 
@@ -116,11 +116,11 @@ public class FriendsListManagerServer {
                 senderData.addFriendListEntry(new FriendListEntry(targetUUID, true).createId());
                 OxygenHelperServer.addObservedPlayer(senderUUID, targetUUID, true);
                 OxygenHelperServer.savePersistentDataDelegated(senderData);
-                OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.ADDED_TO_IGNORED.ordinal());
+                OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.ADDED_TO_IGNORED.ordinal());
             } else
-                OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessages.REQUEST_RESET.ordinal());
+                OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessage.REQUEST_RESET.ordinal());
         } else
-            OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessages.REQUEST_RESET.ordinal());
+            OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessage.REQUEST_RESET.ordinal());
     }
 
     public void removeIgnored(EntityPlayerMP playerMP, UUID targetUUID) {
@@ -131,7 +131,7 @@ public class FriendsListManagerServer {
                 senderData.removeFriendListEntry(targetUUID);
                 OxygenHelperServer.removeObservedPlayer(senderUUID, targetUUID, true);
                 OxygenHelperServer.savePersistentDataDelegated(senderData);
-                OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessages.IGNORED_REMOVED.ordinal());
+                OxygenHelperServer.sendMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListChatMessage.IGNORED_REMOVED.ordinal());
             }
         }
     }

@@ -1,4 +1,4 @@
-package austeretony.oxygen_friendslist.client.gui.friendslist.friendlist.context;
+package austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context;
 
 import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
 import austeretony.alternateui.screen.core.GUIBaseElement;
