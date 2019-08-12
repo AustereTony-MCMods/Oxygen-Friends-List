@@ -1,3 +1,7 @@
+0.8.1b [2019-08-12]
++Added privileges: "maximum friends amount" and "maximum ignored amount".
++Added Oxygen Menu support.
+
 0.8.0b
 +Performance improvements.
 
