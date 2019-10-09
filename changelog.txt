@@ -1,3 +1,6 @@
+0.9.0b [2019-10-09]
++Compatibility with Oxygen Core 0.9.
+
 0.8.1b [2019-08-12]
 +Added privileges: "maximum friends amount" and "maximum ignored amount".
 +Added Oxygen Menu support.
