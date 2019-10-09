@@ -1,19 +1,18 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback;
 
-import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.alternateui.screen.text.GUITextField;
-import austeretony.alternateui.screen.text.GUITextLabel;
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.common.main.OxygenSoundEffects;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.gui.elements.OxygenCallbackGUIFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIText;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUITextField;
+import austeretony.oxygen_core.client.gui.settings.GUISettings;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUIScreen;
 import austeretony.oxygen_friendslist.client.gui.friendslist.IgnoreListGUISection;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.EditNoteCallbackGUIFiller;
-import austeretony.oxygen_friendslist.common.main.FriendListEntry;
+import austeretony.oxygen_friendslist.common.ListEntry;
 
 public class EditNoteGUICallback extends AbstractGUICallback {
 
@@ -21,9 +20,9 @@ public class EditNoteGUICallback extends AbstractGUICallback {
 
     private final IgnoreListGUISection section; 
 
-    private GUITextField noteField;
+    private OxygenGUITextField noteField;
 
-    private GUIButton confirmButton, cancelButton;
+    private OxygenGUIButton confirmButton, cancelButton;
 
     public EditNoteGUICallback(FriendsListGUIScreen screen, IgnoreListGUISection section, int width, int height) {
         super(screen, section, width, height);
@@ -33,22 +32,19 @@ public class EditNoteGUICallback extends AbstractGUICallback {
 
     @Override
     public void init() {
-        this.addElement(new EditNoteCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("oxygen_friends.gui.friendslist.callback.editNote"), true, GUISettings.instance().getTitleScale()));   
-        this.addElement(new GUITextLabel(2, 16).setDisplayText(ClientReference.localize("oxygen.gui.note"), false, GUISettings.instance().getSubTextScale()));  
-        this.addElement(this.noteField = new GUITextField(2, 25, 136, 9, FriendListEntry.MAX_NOTE_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
-                .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
-                .setLineOffset(3).cancelDraggedElementLogic());       
+        this.addElement(new OxygenCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new OxygenGUIText(4, 5, ClientReference.localize("oxygen_friendslist.gui.friendslist.callback.editNote"), GUISettings.get().getTextScale(), GUISettings.get().getEnabledTextColor()));   
+        this.addElement(new OxygenGUIText(6, 18, ClientReference.localize("oxygen.gui.note"), GUISettings.get().getSubTextScale(), GUISettings.get().getEnabledTextColor()));      
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.noteField = new OxygenGUITextField(6, 25, this.getWidth() - 12, 9, ListEntry.MAX_NOTE_LENGTH, "", 3, false, - 1L));
 
-        this.confirmButton.disable();
+        this.addElement(this.confirmButton = new OxygenGUIButton(15, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen.gui.confirmButton")).disable());
+        this.addElement(this.cancelButton = new OxygenGUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen.gui.cancelButton")));
     }
 
     @Override
     protected void onOpen() {
-        this.noteField.setText(this.section.getCurrentEntry().listEntry.getNote());
+        this.noteField.setText(this.section.getCurrentListEntry().getNote());
     }
 
     @Override
@@ -60,23 +56,21 @@ public class EditNoteGUICallback extends AbstractGUICallback {
     @Override
     public boolean keyTyped(char typedChar, int keyCode) {
         boolean flag = super.keyTyped(typedChar, keyCode);   
-        if (this.noteField.isDragged()) {
-            if (!this.noteField.getTypedText().isEmpty())
-                this.confirmButton.enable();
-            else
-                this.confirmButton.disable();
-        }
+        if (this.noteField.isDragged())
+            this.confirmButton.setEnabled(!this.noteField.getTypedText().isEmpty());
         return flag;   
     }
 
     @Override
     public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
-        if (element == this.cancelButton)
-            this.close();
-        else if (element == this.confirmButton) {
-            FriendsListManagerClient.instance().editFriendListEntryNoteSynced(this.section.getCurrentEntry().index, this.noteField.getTypedText());
-            this.section.sortPlayers(0);
-            this.close();
+        if (mouseButton == 0) { 
+            if (element == this.cancelButton)
+                this.close();
+            else if (element == this.confirmButton) {
+                FriendsListManagerClient.instance().getPlayerDataManager().editListEntryNoteSynced(
+                        this.section.getCurrentListEntry().getPlayerUUID(), this.noteField.getTypedText());
+                this.close();
+            }
         }
     }
 }

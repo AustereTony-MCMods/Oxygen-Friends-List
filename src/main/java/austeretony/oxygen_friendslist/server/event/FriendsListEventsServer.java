@@ -1,10 +1,10 @@
-package austeretony.oxygen_friendslist.common.event;
+package austeretony.oxygen_friendslist.server.event;
 
-import austeretony.oxygen.common.api.event.OxygenPlayerLoadedEvent;
-import austeretony.oxygen.common.api.event.OxygenPlayerUnloadedEvent;
-import austeretony.oxygen.common.api.event.OxygenPrivilegesLoadedEvent;
-import austeretony.oxygen_friendslist.common.FriendsListManagerServer;
+import austeretony.oxygen_core.server.api.event.OxygenPlayerLoadedEvent;
+import austeretony.oxygen_core.server.api.event.OxygenPlayerUnloadedEvent;
+import austeretony.oxygen_core.server.api.event.OxygenPrivilegesLoadedEvent;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
+import austeretony.oxygen_friendslist.server.FriendsListManagerServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class FriendsListEventsServer {
@@ -16,11 +16,11 @@ public class FriendsListEventsServer {
 
     @SubscribeEvent
     public void onPlayerLoaded(OxygenPlayerLoadedEvent event) {        
-        FriendsListManagerServer.instance().onPlayerLoaded(event.player);
+        FriendsListManagerServer.instance().onPlayerLoaded(event.playerMP);
     }
 
     @SubscribeEvent
     public void onPlayerUnloaded(OxygenPlayerUnloadedEvent event) {        
-        FriendsListManagerServer.instance().onPlayerUnloaded(event.player);
+        FriendsListManagerServer.instance().onPlayerUnloaded(event.playerMP);
     }
 }

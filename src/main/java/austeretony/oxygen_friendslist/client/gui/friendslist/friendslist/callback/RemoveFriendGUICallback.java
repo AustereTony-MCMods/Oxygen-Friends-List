@@ -1,14 +1,13 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback;
 
-import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.alternateui.screen.text.GUITextBoxLabel;
-import austeretony.alternateui.screen.text.GUITextLabel;
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.common.main.OxygenSoundEffects;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.gui.elements.OxygenCallbackGUIFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIText;
+import austeretony.oxygen_core.client.gui.settings.GUISettings;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUIScreen;
 import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUISection;
@@ -19,9 +18,7 @@ public class RemoveFriendGUICallback extends AbstractGUICallback {
 
     private final FriendsListGUISection section;
 
-    private GUITextBoxLabel requestLabel;       
-
-    private GUIButton confirmButton, cancelButton;
+    private OxygenGUIButton confirmButton, cancelButton;
 
     public RemoveFriendGUICallback(FriendsListGUIScreen screen, FriendsListGUISection section, int width, int height) {
         super(screen, section, width, height);
@@ -31,28 +28,23 @@ public class RemoveFriendGUICallback extends AbstractGUICallback {
 
     @Override
     public void init() {
-        this.addElement(new RemoveFriendCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("oxygen_friendslist.gui.friends.removeFriendCallback"), true, GUISettings.instance().getTitleScale()));
-        this.addElement(this.requestLabel = new GUITextBoxLabel(2, 16, 160, 20));     
+        this.addElement(new OxygenCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new OxygenGUIText(4, 5, ClientReference.localize("oxygen_friendslist.gui.friendslist.callback.remove"), GUISettings.get().getTextScale(), GUISettings.get().getEnabledTextColor()));
+        this.addElement(new OxygenGUIText(6, 18, ClientReference.localize("oxygen_friendslist.gui.friendslist.callback.remove.request"), GUISettings.get().getSubTextScale(), GUISettings.get().getEnabledTextColor()));  
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
-    }
-
-    @Override
-    protected void onOpen() {
-        this.requestLabel.setDisplayText(ClientReference.localize("oxygen_friendslist.gui.friends.removeFriendCallback.request", this.section.getCurrentEntry().getDisplayText()), false, GUISettings.instance().getTextScale());
+        this.addElement(this.confirmButton = new OxygenGUIButton(15, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen.gui.confirmButton")));
+        this.addElement(this.cancelButton = new OxygenGUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen.gui.cancelButton")));
     }
 
     @Override
     public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
-        if (element == this.cancelButton)
-            this.close();
-        else if (element == this.confirmButton) {
-            FriendsListManagerClient.instance().removeFriendSynced(this.section.getCurrentEntry().listEntry.playerUUID);
-            this.section.sortPlayers(0);
-            this.section.unlockAddButton();
-            this.close();            
+        if (mouseButton == 0) { 
+            if (element == this.cancelButton)
+                this.close();
+            else if (element == this.confirmButton) {
+                FriendsListManagerClient.instance().getPlayerDataManager().removeFriendSynced(this.section.getCurrentListEntry().getPlayerUUID());
+                this.close();            
+            }
         }
     }
 }

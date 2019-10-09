@@ -2,9 +2,8 @@ package austeretony.oxygen_friendslist.client.input;
 
 import org.lwjgl.input.Keyboard;
 
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen.client.sync.gui.api.AdvancedGUIHandlerClient;
-import austeretony.oxygen_friendslist.common.main.FriendsListMain;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUIScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
@@ -20,6 +19,6 @@ public class FriendsListKeyHandler {
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {        
         if (FRIENDS_LIST.isPressed())
-            AdvancedGUIHandlerClient.openScreen(FriendsListMain.FRIENDS_LIST_MENU_SCREEN_ID);
+            ClientReference.displayGuiScreen(new FriendsListGUIScreen());
     }
 }

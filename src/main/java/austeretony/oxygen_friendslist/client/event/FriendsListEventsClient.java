@@ -1,29 +1,21 @@
 package austeretony.oxygen_friendslist.client.event;
 
-import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.api.event.OxygenChatMessageEvent;
-import austeretony.oxygen.client.api.event.OxygenClientInitEvent;
-import austeretony.oxygen.client.api.event.OxygenNotificationRecievedEvent;
-import austeretony.oxygen.common.main.OxygenMain;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.api.event.OxygenClientInitEvent;
+import austeretony.oxygen_core.client.api.event.OxygenNotificationRecievedEvent;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
-import austeretony.oxygen_friendslist.common.main.EnumFriendsListChatMessage;
-import austeretony.oxygen_friendslist.common.main.FriendListEntry;
+import austeretony.oxygen_friendslist.common.ListEntry;
+import austeretony.oxygen_friendslist.common.ListEntry.EnumEntryType;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import net.minecraft.util.text.ChatType;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FriendssListEventsClient {
+public class FriendsListEventsClient {
 
     @SubscribeEvent     
     public void onClientInit(OxygenClientInitEvent event) {
         FriendsListManagerClient.instance().init();
-    }
-
-    @SubscribeEvent
-    public void onChatMessage(OxygenChatMessageEvent event) {
-        if (event.modIndex == FriendsListMain.FRIENDS_LIST_MOD_INDEX)
-            EnumFriendsListChatMessage.values()[event.messageIndex].show(event.args);
     }
 
     @SubscribeEvent
@@ -38,11 +30,11 @@ public class FriendssListEventsClient {
         if (event.getType() == ChatType.CHAT) {
             String msg = event.getMessage().getUnformattedText();
             try {
-                for (FriendListEntry entry : FriendsListManagerClient.instance().getClientPlayerData().getFriendListEntries())
-                    if (entry.ignored && msg.indexOf(OxygenHelperClient.getSharedPlayerData(entry.playerUUID).getUsername()) != - 1)
+                for (ListEntry entry : FriendsListManagerClient.instance().getPlayerDataContainer().getListEntries())
+                    if (entry.getType() == EnumEntryType.IGNORED && msg.indexOf(OxygenHelperClient.getPlayerSharedData(entry.getPlayerUUID()).getUsername()) != - 1)
                         event.setCanceled(true);
             } catch (Exception exception) {
-                OxygenMain.OXYGEN_LOGGER.error("Chat message processing failure! Message: {}.", msg);
+                FriendsListMain.LOGGER.error("Chat message processing failure! Message: {}.", msg);
             }
         }
     }

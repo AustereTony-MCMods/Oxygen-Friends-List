@@ -1,11 +1,11 @@
 package austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context;
 
-import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenuElement.ContextMenuAction;
 import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUISection;
 
-public class RemoveFriendContextAction extends AbstractContextAction {
+public class RemoveFriendContextAction implements ContextMenuAction {
 
     private FriendsListGUISection section;
 
@@ -14,7 +14,7 @@ public class RemoveFriendContextAction extends AbstractContextAction {
     }
 
     @Override
-    protected String getName(GUIBaseElement currElement) {
+    public String getName(GUIBaseElement currElement) {
         return ClientReference.localize("oxygen.gui.action.remove");
     }
 
