@@ -44,7 +44,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = FriendsListMain.MODID, 
         name = FriendsListMain.NAME, 
         version = FriendsListMain.VERSION,
-        dependencies = "required-after:oxygen_core@[0.9.2,);",
+        dependencies = "required-after:oxygen_core@[0.9.3,);",
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = FriendsListMain.VERSIONS_FORGE_URL)
 public class FriendsListMain {
@@ -52,7 +52,7 @@ public class FriendsListMain {
     public static final String 
     MODID = "oxygen_friendslist", 
     NAME = "Oxygen: Friends List", 
-    VERSION = "0.9.0", 
+    VERSION = "0.9.1", 
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Friends-List/info/mod_versions_forge.json";
@@ -108,6 +108,7 @@ public class FriendsListMain {
             OxygenGUIHelper.registerOxygenMenuEntry(FriendsListGUIScreen.FRIENDS_LIST_MENU_ENTRY);
             OxygenHelperClient.registerDataSyncHandler(new ListSyncHandlerClient());
         }
+        EnumFriendsListPrivilege.register();
     }
 
     public static void addDefaultPrivileges() {

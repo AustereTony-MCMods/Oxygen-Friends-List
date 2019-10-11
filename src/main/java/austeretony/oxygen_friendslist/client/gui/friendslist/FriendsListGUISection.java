@@ -25,7 +25,6 @@ import austeretony.oxygen_core.client.gui.elements.OxygenSorterGUIElement.EnumSo
 import austeretony.oxygen_core.client.gui.elements.OxygenTexturedGUIButton;
 import austeretony.oxygen_core.client.gui.elements.SectionsGUIDDList;
 import austeretony.oxygen_core.client.gui.settings.GUISettings;
-import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.server.OxygenPlayerData.EnumActivityStatus;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.FriendListGUIFiller;
@@ -157,7 +156,7 @@ public class FriendsListGUISection extends AbstractGUISection {
     }
 
     public static EnumActivityStatus getActivityStatus(ListEntry entry) {
-        return EnumActivityStatus.values()[OxygenHelperClient.getPlayerSharedData(entry.getPlayerUUID()).getByte(OxygenMain.ACTIVITY_STATUS_SHARED_DATA_ID)];
+        return OxygenHelperClient.getPlayerActivityStatus(OxygenHelperClient.getPlayerSharedData(entry.getPlayerUUID()));
     }
 
     public static String getUsername(ListEntry entry) {

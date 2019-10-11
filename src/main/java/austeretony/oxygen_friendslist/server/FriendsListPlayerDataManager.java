@@ -104,6 +104,7 @@ public class FriendsListPlayerDataManager {
                 ListEntry newEntry = new ListEntry(entry.getType(), targetUUID);
                 newEntry.setNote(note);
                 playerData.addListEntry(newEntry);
+                OxygenMain.network().sendTo(new CPListEntryAction(CPListEntryAction.EnumAction.ADDED, newEntry), playerMP);
                 playerData.setChanged(true);
                 OxygenHelperServer.sendStatusMessage(playerMP, FriendsListMain.FRIENDS_LIST_MOD_INDEX, EnumFriendsListStatusMessage.NOTE_EDITED.ordinal());
             }
