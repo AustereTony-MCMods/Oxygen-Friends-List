@@ -1,20 +1,51 @@
+0.10.0b [2020-01-17]
++ Improved menu design.
++ The maximum number of symbols for a user note in the list is reduced to 60.
++ Added 1 second cooldown for sending packets - operations in the friends list menu.
++ Updated configuration options:
+ Client
+ - "enable_friendslist_key" [boolean] - enable the "open friends list" key
+ 
+ Server
+ - "friend_request_expire_time_seconds" [int] - friend request time in seconds
+ 
+ - "max_friends_amount" [int] (synchronized) - maximum number of friends
+ - "max_ignored_amount" [int] (synchronized) - maximum number of ignored users
+
++ Added commands:
+ Client [/oxygenc]
+ - Open Friends List: /oxygenc friendslist
+ - Reset client data: /oxygenc friendslist -reset-data
+
++ Added privileges:
+ - "friendslist:preventIgnore" [id - 600, type - BOOLEAN] - prevent adding a player with this privilege to the ignored lists.
+ - "friendslist:maxFriendsAmount" [id - 601, type - INT] - max. number of friends.
+ - "friendslist:maxIgnoredAmount" [id - 602, type - INT] - max. the number of ignored users.
+
++ Added client settings:
+ Common
+ - the ability to open the list of friends through the general menu (Oxygen Menu)
+ 
+ Interface
+ - menu alignment
+
 0.9.1b [2019-10-11]
-+Fixed a GUI bug with the disappearance of players from the friends list and ignored list when editing notes.
-+Fixed sorting of players in lists.
++ Fixed a GUI bug with the disappearance of players from the friends list and ignored list when editing notes.
++ Fixed sorting of players in lists.
 
 0.9.0b [2019-10-09]
-+Compatibility with Oxygen Core 0.9.
++ Compatibility with Oxygen Core 0.9.
 
 0.8.1b [2019-08-12]
-+Added privileges: "maximum friends amount" and "maximum ignored amount".
-+Added Oxygen Menu support.
++ Added privileges: "maximum friends amount" and "maximum ignored amount".
++ Added Oxygen Menu support.
 
 0.8.0b
-+Performance improvements.
++ Performance improvements.
 
 0.1.1b
-+Last activity time tooltip for offline players now shows correct time 
++ Last activity time tooltip for offline players now shows correct time 
 (displayed when you hover over the activity icon).
 
 0.1.0a
-+Initial release.
++ Initial release.
