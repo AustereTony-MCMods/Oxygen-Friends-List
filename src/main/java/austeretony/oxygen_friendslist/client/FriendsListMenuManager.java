@@ -1,14 +1,14 @@
 package austeretony.oxygen_friendslist.client;
 
 import austeretony.oxygen_core.client.api.ClientReference;
-import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUIScreen;
+import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListScreen;
 
 public class FriendsListMenuManager {
 
     public void sharedDataSynchronized() {
         ClientReference.delegateToClientThread(()->{
             if (isMenuOpened())
-                ((FriendsListGUIScreen) ClientReference.getCurrentScreen()).sharedDataSynchronized();
+                ((FriendsListScreen) ClientReference.getCurrentScreen()).sharedDataSynchronized();
         });
 
     }
@@ -16,25 +16,25 @@ public class FriendsListMenuManager {
     public void listSynchronized() {
         ClientReference.delegateToClientThread(()->{
             if (isMenuOpened())
-                ((FriendsListGUIScreen) ClientReference.getCurrentScreen()).listSynchronized();;
+                ((FriendsListScreen) ClientReference.getCurrentScreen()).listSynchronized();;
         });
     }
 
     public void entryAdded() {
         ClientReference.delegateToClientThread(()->{
             if (isMenuOpened())
-                ((FriendsListGUIScreen) ClientReference.getCurrentScreen()).entryAdded();;
+                ((FriendsListScreen) ClientReference.getCurrentScreen()).entryAdded();;
         });    
     }
 
     public void entryRemoved() {
         ClientReference.delegateToClientThread(()->{
             if (isMenuOpened())
-                ((FriendsListGUIScreen) ClientReference.getCurrentScreen()).entryRemoved();;
+                ((FriendsListScreen) ClientReference.getCurrentScreen()).entryRemoved();;
         }); 
     }
 
     public static boolean isMenuOpened() {
-        return ClientReference.hasActiveGUI() && ClientReference.getCurrentScreen() instanceof FriendsListGUIScreen;
+        return ClientReference.hasActiveGUI() && ClientReference.getCurrentScreen() instanceof FriendsListScreen;
     }
 }

@@ -6,7 +6,6 @@ import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.network.Packet;
 import austeretony.oxygen_core.common.util.ByteBufUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
-import austeretony.oxygen_core.server.api.RequestsFilterHelper;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import austeretony.oxygen_friendslist.server.FriendsListManagerServer;
 import io.netty.buffer.ByteBuf;
@@ -35,7 +34,7 @@ public class SPEditListEntryNote extends Packet {
     @Override
     public void read(ByteBuf buffer, INetHandler netHandler) {
         final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), FriendsListMain.EDIT_NOTE_REQUEST_ID)) {
+        if (OxygenHelperServer.isNetworkRequestAvailable(CommonReference.getPersistentUUID(playerMP), FriendsListMain.LIST_MANAGEMENT_REQUEST_ID)) {
             final UUID playerUUID = ByteBufUtils.readUUID(buffer);
             final String note = ByteBufUtils.readString(buffer);
             OxygenHelperServer.addRoutineTask(()->FriendsListManagerServer.instance().getPlayerDataManager().editListEntryNote(playerMP, playerUUID, note));

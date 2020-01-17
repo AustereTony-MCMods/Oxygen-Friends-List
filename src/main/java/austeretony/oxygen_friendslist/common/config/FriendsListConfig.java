@@ -2,22 +2,20 @@ package austeretony.oxygen_friendslist.common.config;
 
 import java.util.List;
 
-import austeretony.oxygen_core.common.EnumValueType;
 import austeretony.oxygen_core.common.api.CommonReference;
-import austeretony.oxygen_core.common.api.config.AbstractConfigHolder;
-import austeretony.oxygen_core.common.api.config.ConfigValueImpl;
+import austeretony.oxygen_core.common.api.config.AbstractConfig;
 import austeretony.oxygen_core.common.config.ConfigValue;
+import austeretony.oxygen_core.common.config.ConfigValueUtils;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 
-public class FriendsListConfig extends AbstractConfigHolder {
+public class FriendsListConfig extends AbstractConfig {
 
     public static final ConfigValue
-    LIST_SAVE_DELAY_MINUTES = new ConfigValueImpl(EnumValueType.INT, "setup", "list_save_delay_minutes"),
+    ENABLE_FRIENDSLIST_KEY = ConfigValueUtils.getValue("client", "enable_friendslist_key", true),
 
-    FRIEND_REQUEST_EXPIRE_TIME_SECONDS = new ConfigValueImpl(EnumValueType.INT, "main", "friend_request_expire_time_seconds"),
-    
-    MAX_FRIENDS_AMOUNT = new ConfigValueImpl(EnumValueType.INT, "main", "max_friends_amount"),
-    MAX_IGNORED_AMOUNT = new ConfigValueImpl(EnumValueType.INT, "main", "max_ignored_amount");
+    FRIEND_REQUEST_EXPIRE_TIME_SECONDS = ConfigValueUtils.getValue("server", "friend_request_expire_time_seconds", 20),   
+    MAX_FRIENDS_AMOUNT = ConfigValueUtils.getValue("server", "max_friends_amount", 20, true),
+    MAX_IGNORED_AMOUNT = ConfigValueUtils.getValue("server", "max_ignored_amount", 20, true);
 
     @Override
     public String getDomain() {
@@ -25,32 +23,16 @@ public class FriendsListConfig extends AbstractConfigHolder {
     }
 
     @Override
-    public String getVersion() {
-        return FriendsListMain.VERSION_CUSTOM;
-    }
-
-    @Override
     public String getExternalPath() {
-        return CommonReference.getGameFolder() + "/config/oxygen/friends_list.json";
-    }
-
-    @Override
-    public String getInternalPath() {
-        return "assets/oxygen_friendslist/friends_list.json";
+        return CommonReference.getGameFolder() + "/config/oxygen/friends-list.json";
     }
 
     @Override
     public void getValues(List<ConfigValue> values) {
-        values.add(LIST_SAVE_DELAY_MINUTES);
+        values.add(ENABLE_FRIENDSLIST_KEY);
 
         values.add(FRIEND_REQUEST_EXPIRE_TIME_SECONDS);
-        
         values.add(MAX_FRIENDS_AMOUNT);
         values.add(MAX_IGNORED_AMOUNT);
-    }
-
-    @Override
-    public boolean sync() {
-        return true;
     }
 }

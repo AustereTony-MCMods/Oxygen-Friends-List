@@ -1,9 +1,6 @@
 package austeretony.oxygen_friendslist.server;
 
-import java.util.concurrent.TimeUnit;
-
-import austeretony.oxygen_core.server.OxygenManagerServer;
-import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
+import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class FriendsListManagerServer {
@@ -18,18 +15,14 @@ public class FriendsListManagerServer {
         this.dataManager = new FriendsListPlayerDataManager(this);
     }
 
-    private void scheduleRepeatableProcesses() {
-        OxygenManagerServer.instance().getExecutionManager().getExecutors().getSchedulerExecutorService().scheduleAtFixedRate(
-                ()->this.dataContainer.saveData(), 
-                FriendsListConfig.LIST_SAVE_DELAY_MINUTES.getIntValue(), 
-                FriendsListConfig.LIST_SAVE_DELAY_MINUTES.getIntValue(), 
-                TimeUnit.MINUTES);
+    private void registerPersistentData() {
+        OxygenHelperServer.registerPersistentData(()->this.dataContainer.save());
     }
 
     public static void create() {
         if (instance == null) {
             instance = new FriendsListManagerServer();
-            instance.scheduleRepeatableProcesses();
+            instance.registerPersistentData();
         }
     }
 

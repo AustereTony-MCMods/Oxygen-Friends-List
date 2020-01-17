@@ -2,20 +2,20 @@ package austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.contex
 
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
-import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenuElement.ContextMenuAction;
-import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListGUISection;
+import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu.OxygenContextMenuAction;
+import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListSection;
 
-public class EditNoteContextAction implements ContextMenuAction {
+public class EditNoteContextAction implements OxygenContextMenuAction {
 
-    private FriendsListGUISection section;
+    private FriendsListSection section;
 
-    public EditNoteContextAction(FriendsListGUISection section) {
+    public EditNoteContextAction(FriendsListSection section) {
         this.section = section;
     }
 
     @Override
-    public String getName(GUIBaseElement currElement) {
-        return ClientReference.localize("oxygen.gui.action.editNote");
+    public String getLocalizedName(GUIBaseElement currElement) {
+        return ClientReference.localize("oxygen_friendslist.gui.context.editNote");
     }
 
     @Override

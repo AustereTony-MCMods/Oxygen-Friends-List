@@ -2,20 +2,20 @@ package austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.context
 
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
-import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenuElement.ContextMenuAction;
-import austeretony.oxygen_friendslist.client.gui.friendslist.IgnoreListGUISection;
+import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu.OxygenContextMenuAction;
+import austeretony.oxygen_friendslist.client.gui.friendslist.IgnoreListSection;
 
-public class EditNoteContextAction implements ContextMenuAction {
+public class EditNoteContextAction implements OxygenContextMenuAction {
 
-    private IgnoreListGUISection section;
+    private IgnoreListSection section;
 
-    public EditNoteContextAction(IgnoreListGUISection section) {
+    public EditNoteContextAction(IgnoreListSection section) {
         this.section = section;
     }
 
     @Override
-    public String getName(GUIBaseElement currElement) {
-        return ClientReference.localize("oxygen.gui.action.editNote");
+    public String getLocalizedName(GUIBaseElement currElement) {
+        return ClientReference.localize("oxygen_friendslist.gui.context.editNote");
     }
 
     @Override

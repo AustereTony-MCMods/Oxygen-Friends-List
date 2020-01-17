@@ -1,4 +1,9 @@
-key.oxygen_friendslist.openFriendsList=Open Friends List
+key.oxygen_friendslist.friendsList=Open Friends List
+
+oxygen_friendslist.gui.settings.module.friendslist=Friends List
+
+oxygen_friendslist.gui.settings.option.addFriendsList=Friends List
+oxygen_friendslist.gui.settings.option.alignmentFriendsList=Friends List
 
 oxygen_friendslist.gui.action.addToFriends=Add to Friends
 oxygen_friendslist.gui.action.addToIgnored=Ignore
@@ -21,6 +26,10 @@ oxygen_friendslist.gui.ignorelist.callback.remove=Remove
 oxygen_friendslist.gui.ignorelist.callback.remove.request=Player will be removed from list.
 oxygen_friendslist.gui.friendslist.callback.editNote=Edit Note
 
+oxygen_friendslist.gui.context.editNote=Edit Note
+
+oxygen_friendslist.request.friendRequest=%s sent you friend request.
+
 oxygen_friendslist.status.senderFriendRequestAccepted=Your friend request accepted
 oxygen_friendslist.status.targetFriendRequestAccepted=You accepted friend request
 oxygen_friendslist.status.senderFriendRequestRejected=Your friend request rejected
@@ -30,4 +39,4 @@ oxygen_friendslist.status.addedToIgnored=Player added to ignore list
 oxygen_friendslist.status.noteEdited=Note edited
 oxygen_friendslist.status.ignoredRemoved=Player removed from ignore list
 
-oxygen_friendslist.command.dataReset=<oxygen: friends list> client data reset.
+oxygen_friendslist.command.dataReset=Client friends list reset.

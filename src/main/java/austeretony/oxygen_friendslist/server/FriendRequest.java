@@ -33,7 +33,7 @@ public class FriendRequest extends AbstractNotification {
 
     @Override
     public String getDescription() {
-        return "oxygen.request.friendRequest";
+        return "oxygen_friendslist.request.friendRequest";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class FriendRequest extends AbstractNotification {
 
     @Override
     public int getExpireTimeSeconds() {
-        return FriendsListConfig.FRIEND_REQUEST_EXPIRE_TIME_SECONDS.getIntValue();
+        return FriendsListConfig.FRIEND_REQUEST_EXPIRE_TIME_SECONDS.asInt();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package austeretony.oxygen_friendslist.client;
 
-import austeretony.oxygen_core.common.status.ChatMessagesHandler;
+import austeretony.oxygen_core.common.chat.ChatMessagesHandler;
 import austeretony.oxygen_friendslist.common.main.EnumFriendsListStatusMessage;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 
@@ -13,6 +13,6 @@ public class FriendsListStatusMessagesHandler implements ChatMessagesHandler {
 
     @Override
     public String getMessage(int messageIndex) {
-        return EnumFriendsListStatusMessage.values()[messageIndex].localizedName();
+        return EnumFriendsListStatusMessage.values()[messageIndex].localized();
     }
 }

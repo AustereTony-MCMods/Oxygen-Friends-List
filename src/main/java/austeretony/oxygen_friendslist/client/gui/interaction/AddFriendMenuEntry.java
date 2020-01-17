@@ -2,15 +2,16 @@ package austeretony.oxygen_friendslist.client.gui.interaction;
 
 import java.util.UUID;
 
+import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
-import austeretony.oxygen_core.client.interaction.InteractionMenuEntry;
+import austeretony.oxygen_core.client.interaction.PlayerInteractionMenuEntry;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 
-public class AddIgnoredActionExecutor implements InteractionMenuEntry {
+public class AddFriendMenuEntry implements PlayerInteractionMenuEntry {
 
     @Override
-    public String getName() {
-        return "oxygen_friendslist.interaction.ignore";
+    public String getLocalizedName() {
+        return ClientReference.localize("oxygen_friendslist.interaction.addFriend");
     }
 
     @Override
@@ -20,6 +21,6 @@ public class AddIgnoredActionExecutor implements InteractionMenuEntry {
 
     @Override
     public void execute(UUID playerUUID) {
-        FriendsListManagerClient.instance().getPlayerDataManager().addToIgnoredSynced(playerUUID);
+        FriendsListManagerClient.instance().getPlayerDataManager().sendFriendRequestSynced(playerUUID);
     }
 }

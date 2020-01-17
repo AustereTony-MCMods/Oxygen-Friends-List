@@ -2,7 +2,6 @@ package austeretony.oxygen_friendslist.client.event;
 
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.event.OxygenClientInitEvent;
-import austeretony.oxygen_core.client.api.event.OxygenNotificationRecievedEvent;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 import austeretony.oxygen_friendslist.common.ListEntry;
 import austeretony.oxygen_friendslist.common.ListEntry.EnumEntryType;
@@ -16,13 +15,6 @@ public class FriendsListEventsClient {
     @SubscribeEvent     
     public void onClientInit(OxygenClientInitEvent event) {
         FriendsListManagerClient.instance().init();
-    }
-
-    @SubscribeEvent
-    public void onNotificationRecieved(OxygenNotificationRecievedEvent event) {
-        if (event.notification.getIndex() == FriendsListMain.FRIEND_REQUEST_ID 
-                && OxygenHelperClient.getClientSettingBoolean(FriendsListMain.FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID))
-            event.notification.accepted(null);
     }
 
     @SubscribeEvent

@@ -5,37 +5,51 @@ import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.core.GUIWorkspace;
 import austeretony.alternateui.util.EnumGUIAlignment;
-import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.gui.menu.OxygenMenuEntry;
+import austeretony.oxygen_friendslist.client.gui.menu.FriendsListMenuEntry;
+import austeretony.oxygen_friendslist.client.settings.gui.EnumFriendsListGUISetting;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import net.minecraft.util.ResourceLocation;
 
-public class FriendsListGUIScreen extends AbstractGUIScreen {
+public class FriendsListScreen extends AbstractGUIScreen {
 
     public static final ResourceLocation NOTE_ICONS = new ResourceLocation(FriendsListMain.MODID, "textures/gui/note_icons.png");
 
     public static final OxygenMenuEntry FRIENDS_LIST_MENU_ENTRY = new FriendsListMenuEntry();
 
-    private FriendsListGUISection friendListSection;
+    private FriendsListSection friendListSection;
 
-    private IgnoreListGUISection ignoreListSection;
+    private IgnoreListSection ignoreListSection;
 
-    public FriendsListGUIScreen() {
+    public FriendsListScreen() {
         OxygenHelperClient.syncSharedData(FriendsListMain.FRIENDS_LIST_MENU_SCREEN_ID);
     }
 
     @Override
     protected GUIWorkspace initWorkspace() {
-        return new GUIWorkspace(this, 195, 179).setAlignment(EnumGUIAlignment.RIGHT, - 10, 0);
+        EnumGUIAlignment alignment = EnumGUIAlignment.CENTER;
+        switch (EnumFriendsListGUISetting.FRIENDS_LIST_ALIGNMENT.get().asInt()) {
+        case - 1: 
+            alignment = EnumGUIAlignment.LEFT;
+            break;
+        case 0:
+            alignment = EnumGUIAlignment.CENTER;
+            break;
+        case 1:
+            alignment = EnumGUIAlignment.RIGHT;
+            break;    
+        default:
+            alignment = EnumGUIAlignment.CENTER;
+            break;
+        }
+        return new GUIWorkspace(this, 195, 200).setAlignment(alignment, 0, 0);
     }
 
     @Override
     protected void initSections() {
-        this.getWorkspace().initSection(this.friendListSection = (FriendsListGUISection) new FriendsListGUISection(this)
-                .setDisplayText(ClientReference.localize("oxygen_friendslist.gui.friendslist.title")).enable());
-        this.getWorkspace().initSection(this.ignoreListSection = (IgnoreListGUISection) new IgnoreListGUISection(this)
-                .setDisplayText(ClientReference.localize("oxygen_friendslist.gui.ignorelist.title")).enable()); 
+        this.getWorkspace().initSection(this.friendListSection = (FriendsListSection) new FriendsListSection(this).enable());
+        this.getWorkspace().initSection(this.ignoreListSection = (IgnoreListSection) new IgnoreListSection(this).enable()); 
     }
 
     @Override
@@ -72,11 +86,11 @@ public class FriendsListGUIScreen extends AbstractGUIScreen {
         this.ignoreListSection.entryRemoved();
     }
 
-    public FriendsListGUISection getFriendListSection() {
+    public FriendsListSection getFriendListSection() {
         return this.friendListSection;
     }
 
-    public IgnoreListGUISection getIgnoreListSection() {
+    public IgnoreListSection getIgnoreListSection() {
         return this.ignoreListSection;
     }
 }

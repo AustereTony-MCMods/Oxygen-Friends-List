@@ -6,14 +6,14 @@ import java.io.IOException;
 import java.util.UUID;
 
 import austeretony.oxygen_core.common.persistent.PersistentEntry;
-import austeretony.oxygen_core.common.sync.SynchronizedData;
+import austeretony.oxygen_core.common.sync.SynchronousEntry;
 import austeretony.oxygen_core.common.util.ByteBufUtils;
 import austeretony.oxygen_core.common.util.StreamUtils;
 import io.netty.buffer.ByteBuf;
 
-public class ListEntry implements PersistentEntry, SynchronizedData {
+public class ListEntry implements PersistentEntry, SynchronousEntry {
 
-    public static final int MAX_NOTE_LENGTH = 50;
+    public static final int MAX_NOTE_LENGTH = 60;
 
     private long entryId;
 
@@ -26,7 +26,6 @@ public class ListEntry implements PersistentEntry, SynchronizedData {
     public ListEntry() {}
 
     public ListEntry(EnumEntryType type, UUID playerUUID) {
-        this.entryId = System.currentTimeMillis();
         this.type = type;
         this.playerUUID = playerUUID;
     }

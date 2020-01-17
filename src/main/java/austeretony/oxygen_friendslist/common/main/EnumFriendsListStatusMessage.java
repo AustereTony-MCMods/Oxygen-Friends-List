@@ -19,7 +19,7 @@ public enum EnumFriendsListStatusMessage {
         this.status = "oxygen_friendslist.status." + status;
     }
 
-    public String localizedName() {
+    public String localized() {
         return ClientReference.localize(this.status);
     }
 }

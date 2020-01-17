@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.StreamUtils;
-import austeretony.oxygen_core.server.api.PrivilegeProviderServer;
+import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_friendslist.common.ListEntry;
 import austeretony.oxygen_friendslist.common.ListEntry.EnumEntryType;
 import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
@@ -22,7 +22,7 @@ public class FriendsListPlayerData extends AbstractPersistentData {
 
     private UUID playerUUID;
 
-    private final Map<Long, ListEntry> entries = new ConcurrentHashMap<>(10);
+    private final Map<Long, ListEntry> entries = new ConcurrentHashMap<>(5);
 
     public String dataPath;
 
@@ -48,25 +48,27 @@ public class FriendsListPlayerData extends AbstractPersistentData {
     }
 
     public int getFriendsAmount() {
-        return (int) this.entries.values()
-                .stream()
-                .filter((e)->e.getType() == EnumEntryType.FRIEND)
-                .count();
+        int amount = 0;
+        for (ListEntry entry : this.entries.values())
+            if (entry.getType() == EnumEntryType.FRIEND)
+                amount++;
+        return amount;
     }
 
     public int getIgnoredAmount() {
-        return (int) this.entries.values()
-                .stream()
-                .filter((e)->e.getType() == EnumEntryType.IGNORED)
-                .count();   
+        int amount = 0;
+        for (ListEntry entry : this.entries.values())
+            if (entry.getType() == EnumEntryType.IGNORED)
+                amount++;
+        return amount;
     }
 
     public boolean canAddFriend() {
-        return this.getFriendsAmount() < PrivilegeProviderServer.getValue(this.playerUUID, EnumFriendsListPrivilege.MAX_FRIENDS_AMOUNT.toString(), FriendsListConfig.MAX_FRIENDS_AMOUNT.getIntValue());
+        return this.getFriendsAmount() < PrivilegesProviderServer.getAsInt(this.playerUUID, EnumFriendsListPrivilege.MAX_FRIENDS_AMOUNT.id(), FriendsListConfig.MAX_FRIENDS_AMOUNT.asInt());
     }
 
     public boolean canAddIgnored() {
-        return this.getIgnoredAmount() < PrivilegeProviderServer.getValue(this.playerUUID, EnumFriendsListPrivilege.MAX_IGNORED_AMOUNT.toString(), FriendsListConfig.MAX_IGNORED_AMOUNT.getIntValue());
+        return this.getIgnoredAmount() < PrivilegesProviderServer.getAsInt(this.playerUUID, EnumFriendsListPrivilege.MAX_IGNORED_AMOUNT.id(), FriendsListConfig.MAX_IGNORED_AMOUNT.asInt());
     }
 
     public boolean haveEntryForUUID(UUID playerUUID) {
@@ -110,6 +112,12 @@ public class FriendsListPlayerData extends AbstractPersistentData {
         return false;
     }
 
+    public long getNewEntryId(long seed) {
+        while (this.entries.containsKey(seed))
+            seed++;
+        return seed;
+    }
+
     @Override
     public String getDisplayName() {
         return "friendslist_player_data";
@@ -118,11 +126,6 @@ public class FriendsListPlayerData extends AbstractPersistentData {
     @Override
     public String getPath() {
         return this.dataPath;
-    }
-
-    @Override
-    public long getSaveDelayMinutes() {
-        return FriendsListConfig.LIST_SAVE_DELAY_MINUTES.getIntValue();
     }
 
     @Override

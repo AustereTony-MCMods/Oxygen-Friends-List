@@ -15,25 +15,23 @@ public class FriendsListPlayerDataContainer {
         return this.playersData.values();
     }
 
-    public void createPlayerData(UUID playerUUID) {        
-        this.playersData.put(playerUUID, new FriendsListPlayerData(
+    public FriendsListPlayerData createPlayerData(UUID playerUUID) {
+        FriendsListPlayerData data = new FriendsListPlayerData(
                 playerUUID, 
-                OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/friendslist/player_data.dat"));
+                OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/friendslist/player_data.dat");
+        this.playersData.put(playerUUID, data);
+        return data;
     }
 
     public void removePlayerData(UUID playerUUID) {
         this.playersData.remove(playerUUID);
     }
 
-    public boolean playerDataExist(UUID playerUUID) {
-        return this.playersData.containsKey(playerUUID);
-    }
-
     public FriendsListPlayerData getPlayerData(UUID playerUUID) {
         return this.playersData.get(playerUUID);
     }
 
-    public void saveData() {
+    public void save() {
         OxygenHelperServer.addRoutineTask(()->{
             for (FriendsListPlayerData data : this.playersData.values()) {
                 if (data.isChanged()) {
@@ -45,13 +43,14 @@ public class FriendsListPlayerDataContainer {
     }
 
     public void onPlayerLoaded(UUID playerUUID) {
-        if (!this.playerDataExist(playerUUID))
-            this.createPlayerData(playerUUID);
-        OxygenHelperServer.loadPersistentDataAsync(this.getPlayerData(playerUUID));
+        if (this.getPlayerData(playerUUID) == null) {
+            FriendsListPlayerData data = this.createPlayerData(playerUUID);
+            OxygenHelperServer.loadPersistentDataAsync(data);
+        }
     }
 
-    public void onPlayerUnloaded(UUID playerUUID) {
+    /*public void onPlayerUnloaded(UUID playerUUID) {
         if (this.playerDataExist(playerUUID))
             this.removePlayerData(playerUUID);
-    }
+    }*/
 }

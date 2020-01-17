@@ -1,4 +1,7 @@
-key.oxygen_friendslist.openFriendsList=Открыть Список Друзей
+key.oxygen_friendslist.friendsList=Открыть Список Друзей
+
+oxygen_friendslist.gui.settings.option.alignmentFriendsList=Список Друзей
+oxygen_friendslist.gui.settings.option.addFriendsList=Список Друзей
 
 oxygen_friendslist.gui.action.addToFriends=Доб. в Друзья
 oxygen_friendslist.gui.action.addToIgnored=Игнорировать
@@ -20,6 +23,10 @@ oxygen_friendslist.gui.ignorelist.callback.addIgnored.request=Добавить �
 oxygen_friendslist.gui.ignorelist.callback.remove=Удалить
 oxygen_friendslist.gui.ignorelist.callback.remove.request=Игрок будет удалён из списка.
 oxygen_friendslist.gui.friendslist.callback.editNote=Редакторовать Заметку
+
+oxygen_friendslist.gui.context.editNote=Редакт. Заметку
+
+oxygen_friendslist.request.friendRequest=%s отправил вам запрос в друзья.
 
 oxygen_friendslist.status.senderFriendRequestAccepted=Ваш запрос в друзья принят
 oxygen_friendslist.status.targetFriendRequestAccepted=Вы приняли запрос в друзья

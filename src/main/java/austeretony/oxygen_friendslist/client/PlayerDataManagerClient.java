@@ -37,11 +37,13 @@ public class PlayerDataManagerClient {
 
     public void entryAdded(ListEntry entry) {
         this.manager.getPlayerDataContainer().addListEntry(entry);
+        this.manager.getPlayerDataContainer().setChanged(true);
         this.manager.getFriendsListMenuManager().entryAdded();
     }
 
     public void entryRemoved(ListEntry entry) {
         this.manager.getPlayerDataContainer().removeListEntry(entry.getId());
+        this.manager.getPlayerDataContainer().setChanged(true);
         this.manager.getFriendsListMenuManager().entryRemoved();
     }
 }

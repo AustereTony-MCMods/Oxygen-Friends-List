@@ -1,6 +1,8 @@
 package austeretony.oxygen_friendslist.client;
 
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.common.api.CommonReference;
+import austeretony.oxygen_friendslist.client.input.FriendsListKeyHandler;
 
 public class FriendsListManagerClient {
 
@@ -12,14 +14,23 @@ public class FriendsListManagerClient {
 
     private final FriendsListMenuManager menuManager = new FriendsListMenuManager();
 
+    private final FriendsListKeyHandler keyHandler = new FriendsListKeyHandler();
+
     private FriendsListManagerClient() {
         this.dataManager = new PlayerDataManagerClient(this);
+        CommonReference.registerEvent(this.keyHandler);
+
+    }
+
+    private void registerPersistentData() {
         OxygenHelperClient.registerPersistentData(this.dataContainer);
     }
 
     public static void create() {
-        if (instance == null)
+        if (instance == null) {
             instance = new FriendsListManagerClient();
+            instance.registerPersistentData();
+        }
     }
 
     public static FriendsListManagerClient instance() {
@@ -36,6 +47,10 @@ public class FriendsListManagerClient {
 
     public FriendsListMenuManager getFriendsListMenuManager() {
         return this.menuManager;
+    }
+
+    public FriendsListKeyHandler getKeyHandler() {
+        return this.keyHandler;
     }
 
     public void init() {
