@@ -25,8 +25,6 @@ public class PlayerDataContainerClient extends AbstractPersistentData {
 
     private final Map<Long, ListEntry> entries = new ConcurrentHashMap<>(10);
 
-    public String dataPath;
-
     public Set<Long> getListEntriesIds() {
         return this.entries.keySet();
     }

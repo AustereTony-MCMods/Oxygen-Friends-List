@@ -33,6 +33,7 @@ import austeretony.oxygen_friendslist.common.network.client.CPListEntryAction;
 import austeretony.oxygen_friendslist.common.network.server.SPEditListEntryNote;
 import austeretony.oxygen_friendslist.common.network.server.SPManageList;
 import austeretony.oxygen_friendslist.server.FriendsListManagerServer;
+import austeretony.oxygen_friendslist.server.FriendsListPlayerData;
 import austeretony.oxygen_friendslist.server.FriendsListRequestValidator;
 import austeretony.oxygen_friendslist.server.ListSyncHandlerServer;
 import austeretony.oxygen_friendslist.server.event.FriendsListEventsServer;
@@ -46,7 +47,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = FriendsListMain.MODID, 
         name = FriendsListMain.NAME, 
         version = FriendsListMain.VERSION,
-        dependencies = "required-after:oxygen_core@[0.10.0,);",
+        dependencies = "required-after:oxygen_core@[0.10.1,);",
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = FriendsListMain.VERSIONS_FORGE_URL)
 public class FriendsListMain {
@@ -54,7 +55,7 @@ public class FriendsListMain {
     public static final String 
     MODID = "oxygen_friendslist", 
     NAME = "Oxygen: Friends List", 
-    VERSION = "0.10.0", 
+    VERSION = "0.10.1", 
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Friends-List/info/mod_versions_forge.json";
@@ -89,6 +90,11 @@ public class FriendsListMain {
         OxygenHelperServer.registerRequestValidator(new FriendsListRequestValidator());
         OxygenHelperServer.registerDataSyncHandler(new ListSyncHandlerServer());
         NetworkRequestsRegistryServer.registerRequest(LIST_MANAGEMENT_REQUEST_ID, 1000);
+        if (FriendsListConfig.DISABLE_PVP_FOR_FRIENDS.asBoolean())
+            OxygenHelperServer.registerRestrictedAttacksValidator((attackerUUID, attackedUUID)->{
+                FriendsListPlayerData playerData = FriendsListManagerServer.instance().getPlayerDataContainer().getPlayerData(attackerUUID);
+                return !(playerData.haveEntryForUUID(attackedUUID) && !playerData.isIgnored(attackedUUID));
+            });
         EnumFriendsListPrivilege.register();
         if (event.getSide() == Side.CLIENT) {     
             FriendsListManagerClient.create();
