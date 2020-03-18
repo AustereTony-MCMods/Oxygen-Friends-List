@@ -12,8 +12,10 @@ import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
 import austeretony.oxygen_core.client.api.OxygenGUIHelper;
 import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenActivityStatusSwitcher;
 import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu;
+import austeretony.oxygen_core.client.gui.elements.OxygenDefaultBackgroundWithButtonsFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenScrollablePanel;
 import austeretony.oxygen_core.client.gui.elements.OxygenSectionSwitcher;
 import austeretony.oxygen_core.client.gui.elements.OxygenSorter;
@@ -22,25 +24,27 @@ import austeretony.oxygen_core.client.gui.elements.OxygenTextField;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextLabel;
 import austeretony.oxygen_core.common.util.MathUtils;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.FriendListBackgroundFiller;
 import austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback.AddIgnoredCallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback.EditNoteCallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback.EditIgnoredNoteCallback;
 import austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback.RemoveIgnoredCallback;
 import austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.context.EditNoteContextAction;
 import austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.context.RemoveIgnoredContextAction;
 import austeretony.oxygen_friendslist.common.ListEntry;
 import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
 import austeretony.oxygen_friendslist.common.main.EnumFriendsListPrivilege;
+import net.minecraft.client.gui.ScaledResolution;
 
 public class IgnoreListSection extends AbstractGUISection {
 
     private final FriendsListScreen screen;
 
-    private OxygenButton addIgnoredButton;
+    private OxygenKeyButton addIgnoredButton;
 
     private OxygenTextLabel ignoredAmountTextLabel;
 
     private OxygenScrollablePanel ignoredPanel;
+
+    private OxygenActivityStatusSwitcher activityStatusSwitcher;
 
     private OxygenSorter statusSorter, usernameSorter;
 
@@ -60,14 +64,18 @@ public class IgnoreListSection extends AbstractGUISection {
 
     @Override
     public void init() { 
-        this.addElement(new FriendListBackgroundFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addIgnoredCallback = new AddIgnoredCallback(this.screen, this, 140, 46).enableDefaultBackground();
+        this.removeCallback = new RemoveIgnoredCallback(this.screen, this, 140, 36).enableDefaultBackground();
+        this.editNoteCallback = new EditIgnoredNoteCallback(this.screen, this, 140, 46).enableDefaultBackground();
+
+        this.addElement(new OxygenDefaultBackgroundWithButtonsFiller(0, 0, this.getWidth(), this.getHeight()));
         this.addElement(new OxygenTextLabel(4, 12, ClientReference.localize("oxygen_friendslist.gui.friendslist.title"), EnumBaseGUISetting.TEXT_TITLE_SCALE.get().asFloat(), EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.ignoredAmountTextLabel = new OxygenTextLabel(0, 23, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.statusSorter = new OxygenSorter(13, 27, EnumSorting.DOWN, ClientReference.localize("oxygen_core.gui.status")));   
 
-        this.statusSorter.setClickListener((sorting)->{
+        this.statusSorter.setSortingListener((sorting)->{
             this.usernameSorter.reset();
             if (sorting == EnumSorting.DOWN)
                 this.sortPlayers(0);
@@ -77,7 +85,7 @@ public class IgnoreListSection extends AbstractGUISection {
 
         this.addElement(this.usernameSorter = new OxygenSorter(19, 27, EnumSorting.INACTIVE, ClientReference.localize("oxygen_core.gui.username")));  
 
-        this.usernameSorter.setClickListener((sorting)->{
+        this.usernameSorter.setSortingListener((sorting)->{
             this.statusSorter.reset();
             if (sorting == EnumSorting.DOWN)
                 this.sortPlayers(2);
@@ -85,12 +93,12 @@ public class IgnoreListSection extends AbstractGUISection {
                 this.sortPlayers(3);
         });
 
-        this.addElement(this.ignoredPanel = new OxygenScrollablePanel(this.screen, 6, 32, this.getWidth() - 15, 10, 1, 
+        this.addElement(this.ignoredPanel = new OxygenScrollablePanel(this.screen, 6, 33, this.getWidth() - 15, 10, 1, 
                 PrivilegesProviderClient.getAsInt(EnumFriendsListPrivilege.MAX_IGNORED_AMOUNT.id(), FriendsListConfig.MAX_IGNORED_AMOUNT.asInt()), 14, EnumBaseGUISetting.TEXT_PANEL_SCALE.get().asFloat(), true));
         this.addElement(this.searchField = new OxygenTextField(90, 16, 60, 24, ""));
         this.ignoredPanel.initSearchField(this.searchField);
 
-        this.ignoredPanel.<PlayerPanelEntry>setClickListener((previous, clicked, mouseX, mouseY, mouseButton)->this.currentEntryButton = clicked);
+        this.ignoredPanel.<PlayerPanelEntry>setElementClickListener((previous, clicked, mouseX, mouseY, mouseButton)->this.currentEntryButton = clicked);
 
         this.ignoredPanel.initContextMenu(new OxygenContextMenu(
                 new RemoveIgnoredContextAction(this),
@@ -98,16 +106,14 @@ public class IgnoreListSection extends AbstractGUISection {
 
         this.addElement(new OxygenSectionSwitcher(this.getWidth() - 4, 5, this, this.screen.getFriendListSection()));
 
-        this.addElement(this.addIgnoredButton = new OxygenButton(6, this.getHeight() - 11, 40, 10, ClientReference.localize("oxygen_core.gui.add")).disable());     
-        this.addIgnoredButton.setKeyPressListener(Keyboard.KEY_F, 
-                ()->{
-                    if (!this.searchField.isDragged())
-                        this.addIgnoredCallback.open();
-                });
+        this.addElement(this.activityStatusSwitcher = new OxygenActivityStatusSwitcher(7, 16));
 
-        this.addIgnoredCallback = new AddIgnoredCallback(this.screen, this, 140, 48).enableDefaultBackground();
-        this.removeCallback = new RemoveIgnoredCallback(this.screen, this, 140, 38).enableDefaultBackground();
-        this.editNoteCallback = new EditNoteCallback(this.screen, this, 140, 48).enableDefaultBackground();
+        this.addElement(this.addIgnoredButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_friendslist.gui.friendslist.button.addIgnored"), Keyboard.KEY_E, this::openAddIgnoredCallback).disable());     
+    }
+
+    private void calculateButtonsHorizontalPosition() {
+        ScaledResolution sr = new ScaledResolution(this.mc);
+        this.addIgnoredButton.setX((sr.getScaledWidth() - (12 + this.textWidth(this.addIgnoredButton.getDisplayText(), this.addIgnoredButton.getTextScale()))) / 2 - this.screen.guiLeft);
     }
 
     private void sortPlayers(int mode) {
@@ -129,7 +135,7 @@ public class IgnoreListSection extends AbstractGUISection {
         this.searchField.reset();
 
         int maxAmount = PrivilegesProviderClient.getAsInt(EnumFriendsListPrivilege.MAX_IGNORED_AMOUNT.id(), FriendsListConfig.MAX_IGNORED_AMOUNT.asInt());
-        this.ignoredAmountTextLabel.setDisplayText(String.valueOf(ignored.size()) + "/" + String.valueOf(maxAmount));
+        this.ignoredAmountTextLabel.setDisplayText(String.format("%d/%d", ignored.size(), maxAmount));
         this.ignoredAmountTextLabel.setX(this.getWidth() - 6 - this.textWidth(this.ignoredAmountTextLabel.getDisplayText(), EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F));
 
         this.ignoredPanel.getScroller().reset();
@@ -155,14 +161,18 @@ public class IgnoreListSection extends AbstractGUISection {
         return super.keyTyped(typedChar, keyCode); 
     }
 
-    public void sharedDataSynchronized() {}
+    public void sharedDataSynchronized() {
+        this.activityStatusSwitcher.updateActivityStatus();
+    }
 
     public void listSynchronized() {
         if (FriendsListManagerClient.instance().getPlayerDataContainer().canAddIgnored())
             this.addIgnoredButton.enable();
         this.statusSorter.setSorting(EnumSorting.DOWN);
         this.usernameSorter.reset();
-        this.sortPlayers(0);    
+        this.sortPlayers(0);   
+
+        this.calculateButtonsHorizontalPosition();
     }
 
     public void entryAdded() {
@@ -178,14 +188,19 @@ public class IgnoreListSection extends AbstractGUISection {
     }
 
     public ListEntry getCurrentListEntry() {
-        return FriendsListManagerClient.instance().getPlayerDataContainer().getListEntryByUUID(this.currentEntryButton.index);
+        return FriendsListManagerClient.instance().getPlayerDataContainer().getListEntryByUUID(this.currentEntryButton.getWrapped());
     }
 
-    public void openRemoveCallback() {
+    public void openAddIgnoredCallback() {
+        if (!this.searchField.isDragged())
+            this.addIgnoredCallback.open();
+    }
+
+    public void openRemoveIgnoredCallback() {
         this.removeCallback.open();
     }
 
-    public void openEditNoteCallback() {
+    public void openEditIgnoredNoteCallback() {
         this.editNoteCallback.open();
     }
 }

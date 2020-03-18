@@ -24,6 +24,9 @@ oxygen_friendslist.gui.ignorelist.callback.remove=Удалить
 oxygen_friendslist.gui.ignorelist.callback.remove.request=Игрок будет удалён из списка.
 oxygen_friendslist.gui.friendslist.callback.editNote=Редакторовать Заметку
 
+oxygen_friendslist.gui.friendslist.button.addFriend=Добавить в Друзья
+oxygen_friendslist.gui.friendslist.button.addIgnored=Добавить в Игнор
+
 oxygen_friendslist.gui.context.editNote=Редакт. Заметку
 
 oxygen_friendslist.request.friendRequest=%s отправил вам запрос в друзья.

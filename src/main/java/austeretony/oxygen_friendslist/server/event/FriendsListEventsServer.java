@@ -1,7 +1,6 @@
 package austeretony.oxygen_friendslist.server.event;
 
 import austeretony.oxygen_core.server.api.event.OxygenPlayerLoadedEvent;
-import austeretony.oxygen_core.server.api.event.OxygenPlayerUnloadedEvent;
 import austeretony.oxygen_core.server.api.event.OxygenPrivilegesLoadedEvent;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 import austeretony.oxygen_friendslist.server.FriendsListManagerServer;
@@ -16,11 +15,6 @@ public class FriendsListEventsServer {
 
     @SubscribeEvent
     public void onPlayerLoaded(OxygenPlayerLoadedEvent event) {        
-        FriendsListManagerServer.instance().onPlayerLoaded(event.playerMP);
-    }
-
-    @SubscribeEvent
-    public void onPlayerUnloaded(OxygenPlayerUnloadedEvent event) {        
-        FriendsListManagerServer.instance().onPlayerUnloaded(event.playerMP);
+        FriendsListManagerServer.instance().playerLoaded(event.playerMP);
     }
 }

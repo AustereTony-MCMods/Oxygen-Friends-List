@@ -10,11 +10,8 @@ import austeretony.oxygen_core.client.gui.menu.OxygenMenuEntry;
 import austeretony.oxygen_friendslist.client.gui.menu.FriendsListMenuEntry;
 import austeretony.oxygen_friendslist.client.settings.gui.EnumFriendsListGUISetting;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
-import net.minecraft.util.ResourceLocation;
 
 public class FriendsListScreen extends AbstractGUIScreen {
-
-    public static final ResourceLocation NOTE_ICONS = new ResourceLocation(FriendsListMain.MODID, "textures/gui/note_icons.png");
 
     public static final OxygenMenuEntry FRIENDS_LIST_MENU_ENTRY = new FriendsListMenuEntry();
 
@@ -43,7 +40,7 @@ public class FriendsListScreen extends AbstractGUIScreen {
             alignment = EnumGUIAlignment.CENTER;
             break;
         }
-        return new GUIWorkspace(this, 195, 200).setAlignment(alignment, 0, 0);
+        return new GUIWorkspace(this, 195, 188).setAlignment(alignment, 0, 0);
     }
 
     @Override
@@ -67,6 +64,7 @@ public class FriendsListScreen extends AbstractGUIScreen {
 
     public void sharedDataSynchronized() {
         OxygenHelperClient.syncData(FriendsListMain.LIST_DATA_ID);
+
         this.friendListSection.sharedDataSynchronized();
         this.ignoreListSection.sharedDataSynchronized();
     }

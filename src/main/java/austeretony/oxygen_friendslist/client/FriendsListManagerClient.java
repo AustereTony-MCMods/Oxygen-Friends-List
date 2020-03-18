@@ -53,7 +53,7 @@ public class FriendsListManagerClient {
         return this.keyHandler;
     }
 
-    public void init() {
+    public void worldLoaded() {
         OxygenHelperClient.loadPersistentDataAsync(this.dataContainer);
     }
 }

@@ -6,7 +6,7 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu.OxygenContextMenuAction;
-import austeretony.oxygen_core.client.gui.elements.OxygenIndexedPanelEntry;
+import austeretony.oxygen_core.client.gui.elements.OxygenWrapperPanelEntry;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 
 public class IgnoreContextAction implements OxygenContextMenuAction {
@@ -18,14 +18,14 @@ public class IgnoreContextAction implements OxygenContextMenuAction {
 
     @Override
     public boolean isValid(GUIBaseElement currElement) {
-        UUID targetUUID = ((OxygenIndexedPanelEntry<UUID>) currElement).index;
+        UUID targetUUID = ((OxygenWrapperPanelEntry<UUID>) currElement).getWrapped();
         return OxygenHelperClient.isPlayerAvailable(targetUUID) && !FriendsListManagerClient.instance().getPlayerDataContainer().haveEntryForUUID(targetUUID);
 
     }
 
     @Override
     public void execute(GUIBaseElement currElement) {
-        UUID targetUUID = ((OxygenIndexedPanelEntry<UUID>) currElement).index;
+        UUID targetUUID = ((OxygenWrapperPanelEntry<UUID>) currElement).getWrapped();
         FriendsListManagerClient.instance().getPlayerDataManager().addToIgnoredSynced(targetUUID);
     }
 }

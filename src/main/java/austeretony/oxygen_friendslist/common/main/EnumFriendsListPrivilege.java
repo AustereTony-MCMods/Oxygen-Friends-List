@@ -31,7 +31,7 @@ public enum EnumFriendsListPrivilege {
     }
 
     public static void register() {
-        for (EnumFriendsListPrivilege privilege : EnumFriendsListPrivilege.values())
+        for (EnumFriendsListPrivilege privilege : values())
             PrivilegeRegistry.registerPrivilege(privilege.name, privilege.id, privilege.type);
     }
 }

@@ -30,7 +30,7 @@ public enum EnumFriendsListClientSetting {
     }
 
     public static void register() {
-        for (EnumFriendsListClientSetting setting : EnumFriendsListClientSetting.values())
+        for (EnumFriendsListClientSetting setting : values())
             OxygenManagerClient.instance().getClientSettingManager().register(SettingValueUtils.getValue(setting.type, setting.key, setting.baseValue));
     }
 }

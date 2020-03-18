@@ -1,4 +1,4 @@
-package austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback;
+package austeretony.oxygen_friendslist.client.gui.friendslist.ignorelist.callback;
 
 import org.lwjgl.input.Keyboard;
 
@@ -7,29 +7,29 @@ import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenCallbackBackgroundFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextField;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextLabel;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
 import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListScreen;
-import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListSection;
+import austeretony.oxygen_friendslist.client.gui.friendslist.IgnoreListSection;
 import austeretony.oxygen_friendslist.common.ListEntry;
 
-public class EditNoteCallback extends AbstractGUICallback {
+public class EditIgnoredNoteCallback extends AbstractGUICallback {
 
     private final FriendsListScreen screen;
 
-    private final FriendsListSection section;
+    private final IgnoreListSection section; 
 
     private OxygenTextField noteField;
 
-    private OxygenButton confirmButton, cancelButton;
+    private OxygenKeyButton confirmButton, cancelButton;
 
-    public EditNoteCallback(FriendsListScreen screen, FriendsListSection section, int width, int height) {
+    public EditIgnoredNoteCallback(FriendsListScreen screen, IgnoreListSection section, int width, int height) {
         super(screen, section, width, height);
         this.screen = screen;
-        this.section = section; 
+        this.section = section;
     }
 
     @Override
@@ -41,11 +41,8 @@ public class EditNoteCallback extends AbstractGUICallback {
 
         this.addElement(this.noteField = new OxygenTextField(6, 25, this.getWidth() - 12, ListEntry.MAX_NOTE_LENGTH, ""));
 
-        this.addElement(this.confirmButton = new OxygenButton(15, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen_core.gui.confirm")));
-        this.confirmButton.setKeyPressListener(Keyboard.KEY_R, ()->this.confirm(false));
-
-        this.addElement(this.cancelButton = new OxygenButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen_core.gui.cancel")));
-        this.cancelButton.setKeyPressListener(Keyboard.KEY_X, ()->this.close(false));
+        this.addElement(this.confirmButton = new OxygenKeyButton(15, this.getHeight() - 10, ClientReference.localize("oxygen_core.gui.confirm"), Keyboard.KEY_R, ()->this.confirm(false)));
+        this.addElement(this.cancelButton = new OxygenKeyButton(this.getWidth() - 55, this.getHeight() - 10, ClientReference.localize("oxygen_core.gui.cancel"), Keyboard.KEY_X, ()->this.close(false)));
     }
 
     @Override

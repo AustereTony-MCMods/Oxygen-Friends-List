@@ -1,8 +1,5 @@
 package austeretony.oxygen_friendslist.common.main;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import austeretony.oxygen_core.client.api.OxygenGUIHelper;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.PlayerInteractionMenuHelper;
@@ -12,6 +9,7 @@ import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.api.OxygenHelperCommon;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.privilege.PrivilegeUtils;
+import austeretony.oxygen_core.server.OxygenManagerServer;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_core.server.network.NetworkRequestsRegistryServer;
@@ -33,7 +31,7 @@ import austeretony.oxygen_friendslist.common.network.client.CPListEntryAction;
 import austeretony.oxygen_friendslist.common.network.server.SPEditListEntryNote;
 import austeretony.oxygen_friendslist.common.network.server.SPManageList;
 import austeretony.oxygen_friendslist.server.FriendsListManagerServer;
-import austeretony.oxygen_friendslist.server.FriendsListPlayerData;
+import austeretony.oxygen_friendslist.server.FriendsListPlayerDataServer;
 import austeretony.oxygen_friendslist.server.FriendsListRequestValidator;
 import austeretony.oxygen_friendslist.server.ListSyncHandlerServer;
 import austeretony.oxygen_friendslist.server.event.FriendsListEventsServer;
@@ -47,7 +45,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = FriendsListMain.MODID, 
         name = FriendsListMain.NAME, 
         version = FriendsListMain.VERSION,
-        dependencies = "required-after:oxygen_core@[0.10.1,);",
+        dependencies = "required-after:oxygen_core@[0.11.0,);",
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = FriendsListMain.VERSIONS_FORGE_URL)
 public class FriendsListMain {
@@ -55,12 +53,10 @@ public class FriendsListMain {
     public static final String 
     MODID = "oxygen_friendslist", 
     NAME = "Oxygen: Friends List", 
-    VERSION = "0.10.1", 
+    VERSION = "0.11.0", 
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Friends-List/info/mod_versions_forge.json";
-
-    public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     public static final int 
     FRIENDS_LIST_MOD_INDEX = 6,
@@ -69,11 +65,9 @@ public class FriendsListMain {
 
     FRIENDS_LIST_MENU_SCREEN_ID = 60,
 
-    LIST_DATA_ID = 60,
+    LIST_DATA_ID = 65,
 
-    LIST_MANAGEMENT_REQUEST_ID = 66,
-
-    FRIEND_REQUESTS_AUTO_ACCEPT_SETTING_ID = 60;
+    LIST_MANAGEMENT_REQUEST_ID = 60;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -92,7 +86,7 @@ public class FriendsListMain {
         NetworkRequestsRegistryServer.registerRequest(LIST_MANAGEMENT_REQUEST_ID, 1000);
         if (FriendsListConfig.DISABLE_PVP_FOR_FRIENDS.asBoolean())
             OxygenHelperServer.registerRestrictedAttacksValidator((attackerUUID, attackedUUID)->{
-                FriendsListPlayerData playerData = FriendsListManagerServer.instance().getPlayerDataContainer().getPlayerData(attackerUUID);
+                FriendsListPlayerDataServer playerData = FriendsListManagerServer.instance().getPlayerDataContainer().getPlayerData(attackerUUID);
                 return !(playerData.haveEntryForUUID(attackedUUID) && !playerData.isIgnored(attackedUUID));
             });
         EnumFriendsListPrivilege.register();
@@ -103,10 +97,11 @@ public class FriendsListMain {
             OxygenGUIHelper.registerContextAction(20, new IgnoreContextAction());
             OxygenGUIHelper.registerContextAction(50, new AddToFriendsContextAction());//50 - players list menu id
             OxygenGUIHelper.registerContextAction(50, new IgnoreContextAction());
+            OxygenGUIHelper.registerContextAction(110, new AddToFriendsContextAction());//110 - guild menu id
+            OxygenGUIHelper.registerContextAction(110, new IgnoreContextAction());
             OxygenGUIHelper.registerScreenId(FRIENDS_LIST_MENU_SCREEN_ID);
             OxygenHelperClient.registerStatusMessagesHandler(new FriendsListStatusMessagesHandler());
-            OxygenHelperClient.registerSharedDataSyncListener(FRIENDS_LIST_MENU_SCREEN_ID, 
-                    ()->FriendsListManagerClient.instance().getFriendsListMenuManager().sharedDataSynchronized());
+            OxygenHelperClient.registerSharedDataSyncListener(FRIENDS_LIST_MENU_SCREEN_ID, FriendsListManagerClient.instance().getFriendsListMenuManager()::sharedDataSynchronized);
             PlayerInteractionMenuHelper.registerInteractionMenuEntry(new AddFriendMenuEntry());
             PlayerInteractionMenuHelper.registerInteractionMenuEntry(new AddIgnoredMenuEntry());
             OxygenGUIHelper.registerOxygenMenuEntry(FriendsListScreen.FRIENDS_LIST_MENU_ENTRY);
@@ -120,7 +115,8 @@ public class FriendsListMain {
     public static void addDefaultPrivileges() {
         if (PrivilegesProviderServer.getRole(OxygenMain.OPERATOR_ROLE_ID).getPrivilege(EnumFriendsListPrivilege.PREVENT_IGNORE.id()) == null) {
             PrivilegesProviderServer.getRole(OxygenMain.OPERATOR_ROLE_ID).addPrivilege(PrivilegeUtils.getPrivilege(EnumFriendsListPrivilege.PREVENT_IGNORE.id(), true));
-            LOGGER.info("Default Operator role privileges added.");
+            OxygenManagerServer.instance().getPrivilegesContainer().markChanged();
+            OxygenMain.LOGGER.info("[Friends List] Default Operator role privileges added.");
         }
     }
 

@@ -14,14 +14,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 public class FriendRequest extends AbstractNotification {
 
-    public final int index;
-
     public final UUID senderUUID;
 
     public final String senderUsername;
 
-    public FriendRequest(int index, UUID senderUUID, String senderUsername) {
-        this.index = index;
+    public FriendRequest(UUID senderUUID, String senderUsername) {
         this.senderUUID = senderUUID;
         this.senderUsername = senderUsername;
     }
@@ -43,7 +40,7 @@ public class FriendRequest extends AbstractNotification {
 
     @Override
     public int getIndex() {
-        return this.index;
+        return FriendsListMain.FRIEND_REQUEST_ID;
     }
 
     @Override

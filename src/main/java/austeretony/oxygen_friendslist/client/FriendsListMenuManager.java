@@ -5,6 +5,14 @@ import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListScreen;
 
 public class FriendsListMenuManager {
 
+    public static void openFriendsListMenuDelegated() {
+        ClientReference.delegateToClientThread(FriendsListMenuManager::openFriendsListMenu);
+    }
+
+    public static void openFriendsListMenu() {
+        ClientReference.displayGuiScreen(new FriendsListScreen());
+    }
+
     public void sharedDataSynchronized() {
         ClientReference.delegateToClientThread(()->{
             if (isMenuOpened())

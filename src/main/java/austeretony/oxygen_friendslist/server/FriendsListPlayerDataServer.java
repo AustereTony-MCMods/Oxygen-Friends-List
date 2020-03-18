@@ -10,25 +10,25 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.StreamUtils;
+import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_friendslist.common.ListEntry;
 import austeretony.oxygen_friendslist.common.ListEntry.EnumEntryType;
 import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
 import austeretony.oxygen_friendslist.common.main.EnumFriendsListPrivilege;
 
-public class FriendsListPlayerData extends AbstractPersistentData {
+public class FriendsListPlayerDataServer extends AbstractPersistentData {
 
     private UUID playerUUID;
 
     private final Map<Long, ListEntry> entries = new ConcurrentHashMap<>(5);
 
-    public String dataPath;
-
-    public FriendsListPlayerData(UUID playerUUID, String dataPath) {
+    public FriendsListPlayerDataServer(UUID playerUUID) {
         this.playerUUID = playerUUID;
-        this.dataPath = dataPath;
     }
 
     public UUID getPlayerUUID() {
@@ -78,10 +78,12 @@ public class FriendsListPlayerData extends AbstractPersistentData {
         return false;
     }
 
+    @Nullable
     public ListEntry getListEntry(long entryId) {
         return this.entries.get(entryId);
     }
 
+    @Nullable
     public ListEntry getListEntryByUUID(UUID playerUUID) {
         for (ListEntry entry : this.entries.values())
             if (entry.getPlayerUUID().equals(playerUUID))
@@ -112,20 +114,21 @@ public class FriendsListPlayerData extends AbstractPersistentData {
         return false;
     }
 
-    public long getNewEntryId(long seed) {
-        while (this.entries.containsKey(seed))
-            seed++;
-        return seed;
+    public long createId(long seed) {
+        long id = ++seed;
+        while (this.entries.containsKey(id))
+            id++;
+        return id;
     }
 
     @Override
     public String getDisplayName() {
-        return "friendslist_player_data";
+        return "friendslist:player_data_server";
     }
 
     @Override
     public String getPath() {
-        return this.dataPath;
+        return OxygenHelperServer.getDataFolder() + "/server/players/" + this.playerUUID + "/friendslist/player_data.dat";
     }
 
     @Override

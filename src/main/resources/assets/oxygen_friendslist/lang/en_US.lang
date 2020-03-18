@@ -26,6 +26,9 @@ oxygen_friendslist.gui.ignorelist.callback.remove=Remove
 oxygen_friendslist.gui.ignorelist.callback.remove.request=Player will be removed from list.
 oxygen_friendslist.gui.friendslist.callback.editNote=Edit Note
 
+oxygen_friendslist.gui.friendslist.button.addFriend=Add Friend
+oxygen_friendslist.gui.friendslist.button.addIgnored=Add Ignored
+
 oxygen_friendslist.gui.context.editNote=Edit Note
 
 oxygen_friendslist.request.friendRequest=%s sent you friend request.

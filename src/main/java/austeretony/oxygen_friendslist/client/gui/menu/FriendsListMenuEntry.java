@@ -1,17 +1,17 @@
 package austeretony.oxygen_friendslist.client.gui.menu;
 
-import org.lwjgl.input.Keyboard;
-
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.gui.menu.OxygenMenuEntry;
-import austeretony.oxygen_friendslist.client.gui.friendslist.FriendsListScreen;
+import austeretony.oxygen_friendslist.client.FriendsListMenuManager;
 import austeretony.oxygen_friendslist.client.settings.EnumFriendsListClientSetting;
+import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
+import austeretony.oxygen_friendslist.common.main.FriendsListMain;
 
 public class FriendsListMenuEntry implements OxygenMenuEntry {
 
     @Override
     public int getId() {
-        return 60;
+        return FriendsListMain.FRIENDS_LIST_MENU_SCREEN_ID;
     }
 
     @Override
@@ -21,7 +21,7 @@ public class FriendsListMenuEntry implements OxygenMenuEntry {
 
     @Override
     public int getKeyCode() {
-        return Keyboard.KEY_F;
+        return FriendsListConfig.FRIENDSLIST_KEY.asInt();
     }
 
     @Override
@@ -31,6 +31,6 @@ public class FriendsListMenuEntry implements OxygenMenuEntry {
 
     @Override
     public void open() {
-        ClientReference.displayGuiScreen(new FriendsListScreen());
+        FriendsListMenuManager.openFriendsListMenu();
     }
 }

@@ -25,6 +25,6 @@ public class RemoveIgnoredContextAction implements OxygenContextMenuAction {
 
     @Override
     public void execute(GUIBaseElement currElement) {
-        this.section.openRemoveCallback();
+        this.section.openRemoveIgnoredCallback();
     }
 }

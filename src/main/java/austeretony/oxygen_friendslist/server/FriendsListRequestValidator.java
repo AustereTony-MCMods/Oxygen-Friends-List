@@ -8,7 +8,7 @@ public class FriendsListRequestValidator implements RequestValidator {
 
     @Override
     public boolean isValid(UUID senderUUID, UUID requestedUUID) {
-        FriendsListPlayerData 
+        FriendsListPlayerDataServer 
         senderData = FriendsListManagerServer.instance().getPlayerDataContainer().getPlayerData(senderUUID),
         requestedData = FriendsListManagerServer.instance().getPlayerDataContainer().getPlayerData(requestedUUID);
         if (!(senderData.isIgnored(requestedUUID) || requestedData.isIgnored(senderUUID)))

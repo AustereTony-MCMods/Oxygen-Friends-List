@@ -16,9 +16,10 @@ import austeretony.oxygen_core.client.api.OxygenGUIHelper;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
 import austeretony.oxygen_core.client.gui.elements.OxygenActivityStatusSwitcher;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu;
 import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu.OxygenContextMenuAction;
+import austeretony.oxygen_core.client.gui.elements.OxygenDefaultBackgroundWithButtonsFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenScrollablePanel;
 import austeretony.oxygen_core.client.gui.elements.OxygenSectionSwitcher;
 import austeretony.oxygen_core.client.gui.elements.OxygenSorter;
@@ -28,9 +29,8 @@ import austeretony.oxygen_core.client.gui.elements.OxygenTextLabel;
 import austeretony.oxygen_core.common.EnumActivityStatus;
 import austeretony.oxygen_core.common.util.MathUtils;
 import austeretony.oxygen_friendslist.client.FriendsListManagerClient;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.FriendListBackgroundFiller;
 import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.AddFriendCallback;
-import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.EditNoteCallback;
+import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.EditFriendNoteCallback;
 import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.callback.RemoveFriendCallback;
 import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context.EditNoteContextAction;
 import austeretony.oxygen_friendslist.client.gui.friendslist.friendslist.context.RemoveFriendContextAction;
@@ -38,12 +38,13 @@ import austeretony.oxygen_friendslist.common.ListEntry;
 import austeretony.oxygen_friendslist.common.config.FriendsListConfig;
 import austeretony.oxygen_friendslist.common.main.EnumFriendsListPrivilege;
 import austeretony.oxygen_friendslist.common.main.FriendsListMain;
+import net.minecraft.client.gui.ScaledResolution;
 
 public class FriendsListSection extends AbstractGUISection {
 
     private final FriendsListScreen screen;
 
-    private OxygenButton addFriendButton;
+    private OxygenKeyButton addFriendButton;
 
     private OxygenTextLabel friendsAmountTextLabel;
 
@@ -69,14 +70,18 @@ public class FriendsListSection extends AbstractGUISection {
 
     @Override
     public void init() {
-        this.addElement(new FriendListBackgroundFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addFriendCallback = new AddFriendCallback(this.screen, this, 140, 46).enableDefaultBackground();
+        this.removeCallback = new RemoveFriendCallback(this.screen, this, 140, 36).enableDefaultBackground();
+        this.editNoteCallback = new EditFriendNoteCallback(this.screen, this, 140, 46).enableDefaultBackground();   
+
+        this.addElement(new OxygenDefaultBackgroundWithButtonsFiller(0, 0, this.getWidth(), this.getHeight()));
         this.addElement(new OxygenTextLabel(4, 12, ClientReference.localize("oxygen_friendslist.gui.friendslist.title"), EnumBaseGUISetting.TEXT_TITLE_SCALE.get().asFloat(), EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.friendsAmountTextLabel = new OxygenTextLabel(0, 23, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.statusSorter = new OxygenSorter(13, 27, EnumSorting.DOWN, ClientReference.localize("oxygen_core.gui.status")));   
 
-        this.statusSorter.setClickListener((sorting)->{
+        this.statusSorter.setSortingListener((sorting)->{
             this.usernameSorter.reset();
             if (sorting == EnumSorting.DOWN)
                 this.sortPlayers(0);
@@ -86,7 +91,7 @@ public class FriendsListSection extends AbstractGUISection {
 
         this.addElement(this.usernameSorter = new OxygenSorter(19, 27, EnumSorting.INACTIVE, ClientReference.localize("oxygen_core.gui.username")));  
 
-        this.usernameSorter.setClickListener((sorting)->{
+        this.usernameSorter.setSortingListener((sorting)->{
             this.statusSorter.reset();
             if (sorting == EnumSorting.DOWN)
                 this.sortPlayers(2);
@@ -94,12 +99,12 @@ public class FriendsListSection extends AbstractGUISection {
                 this.sortPlayers(3);
         });
 
-        this.addElement(this.friendsPanel = new OxygenScrollablePanel(this.screen, 6, 32, this.getWidth() - 15, 10, 1, 
+        this.addElement(this.friendsPanel = new OxygenScrollablePanel(this.screen, 6, 33, this.getWidth() - 15, 10, 1, 
                 PrivilegesProviderClient.getAsInt(EnumFriendsListPrivilege.MAX_FRIENDS_AMOUNT.id(), FriendsListConfig.MAX_FRIENDS_AMOUNT.asInt()), 14, EnumBaseGUISetting.TEXT_PANEL_SCALE.get().asFloat(), true));
         this.addElement(this.searchField = new OxygenTextField(90, 16, 60, 24, ""));
         this.friendsPanel.initSearchField(this.searchField);
 
-        this.friendsPanel.<PlayerPanelEntry>setClickListener((previous, clicked, mouseX, mouseY, mouseButton)->this.currentEntryButton = clicked);
+        this.friendsPanel.<PlayerPanelEntry>setElementClickListener((previous, clicked, mouseX, mouseY, mouseButton)->this.currentEntryButton = clicked);
 
         List<OxygenContextMenuAction> actions = new ArrayList<>(OxygenManagerClient.instance().getGUIManager().getContextActions(FriendsListMain.FRIENDS_LIST_MENU_SCREEN_ID));
         actions.add(new RemoveFriendContextAction(this));
@@ -112,16 +117,12 @@ public class FriendsListSection extends AbstractGUISection {
 
         this.addElement(this.activityStatusSwitcher = new OxygenActivityStatusSwitcher(7, 16));
 
-        this.addElement(this.addFriendButton = new OxygenButton(6, this.getHeight() - 11, 40, 10, ClientReference.localize("oxygen_core.gui.add")).disable());     
-        this.addFriendButton.setKeyPressListener(Keyboard.KEY_F, 
-                ()->{
-                    if (!this.searchField.isDragged())
-                        this.addFriendCallback.open();
-                });
+        this.addElement(this.addFriendButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_friendslist.gui.friendslist.button.addFriend"), Keyboard.KEY_E, this::openAddFriendCallback).disable());     
+    }
 
-        this.addFriendCallback = new AddFriendCallback(this.screen, this, 140, 48).enableDefaultBackground();
-        this.removeCallback = new RemoveFriendCallback(this.screen, this, 140, 38).enableDefaultBackground();
-        this.editNoteCallback = new EditNoteCallback(this.screen, this, 140, 48).enableDefaultBackground();       
+    private void calculateButtonsHorizontalPosition() {
+        ScaledResolution sr = new ScaledResolution(this.mc);
+        this.addFriendButton.setX((sr.getScaledWidth() - (12 + this.textWidth(this.addFriendButton.getDisplayText(), this.addFriendButton.getTextScale()))) / 2 - this.screen.guiLeft);
     }
 
     private void sortPlayers(int mode) {  
@@ -143,7 +144,7 @@ public class FriendsListSection extends AbstractGUISection {
         this.searchField.reset();
 
         int maxAmount = PrivilegesProviderClient.getAsInt(EnumFriendsListPrivilege.MAX_FRIENDS_AMOUNT.id(), FriendsListConfig.MAX_FRIENDS_AMOUNT.asInt());
-        this.friendsAmountTextLabel.setDisplayText(String.valueOf(friends.size()) + "/" + String.valueOf(maxAmount));
+        this.friendsAmountTextLabel.setDisplayText(String.format("%d/%d", friends.size(), maxAmount));
         this.friendsAmountTextLabel.setX(this.getWidth() - 6 - this.textWidth(this.friendsAmountTextLabel.getDisplayText(), EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F));
 
         this.friendsPanel.getScroller().reset();
@@ -187,6 +188,8 @@ public class FriendsListSection extends AbstractGUISection {
         this.statusSorter.setSorting(EnumSorting.DOWN);
         this.usernameSorter.reset();
         this.sortPlayers(0);
+
+        this.calculateButtonsHorizontalPosition();
     }
 
     public void entryAdded() {
@@ -202,14 +205,19 @@ public class FriendsListSection extends AbstractGUISection {
     }
 
     public ListEntry getCurrentListEntry() {
-        return FriendsListManagerClient.instance().getPlayerDataContainer().getListEntryByUUID(this.currentEntryButton.index);
+        return FriendsListManagerClient.instance().getPlayerDataContainer().getListEntryByUUID(this.currentEntryButton.getWrapped());
     }
 
-    public void openRemoveCallback() {
+    public void openAddFriendCallback() {
+        if (!this.searchField.isDragged())
+            this.addFriendCallback.open();
+    }
+
+    public void openRemoveFriendCallback() {
         this.removeCallback.open();
     }
 
-    public void openEditNoteCallback() {
+    public void openEditFriendNoteCallback() {
         this.editNoteCallback.open();
     }
 }

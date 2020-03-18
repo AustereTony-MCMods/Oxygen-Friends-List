@@ -12,6 +12,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
@@ -44,7 +46,7 @@ public class PlayerDataContainerClient extends AbstractPersistentData {
     public List<ListEntry> getFriends() {
         return this.entries.values()
                 .stream()
-                .filter((e)->e.getType() == EnumEntryType.FRIEND)
+                .filter((entry)->entry.getType() == EnumEntryType.FRIEND)
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +61,7 @@ public class PlayerDataContainerClient extends AbstractPersistentData {
     public List<ListEntry> getIgnored() {
         return this.entries.values()
                 .stream()
-                .filter((e)->e.getType() == EnumEntryType.IGNORED)
+                .filter((entry)->entry.getType() == EnumEntryType.IGNORED)
                 .collect(Collectors.toList());
     }
 
@@ -78,10 +80,12 @@ public class PlayerDataContainerClient extends AbstractPersistentData {
         return false;
     }
 
+    @Nullable
     public ListEntry getListEntry(long entryId) {
         return this.entries.get(entryId);
     }
 
+    @Nullable
     public ListEntry getListEntryByUUID(UUID playerUUID) {
         for (ListEntry entry : this.entries.values())
             if (entry.getPlayerUUID().equals(playerUUID))
@@ -114,7 +118,7 @@ public class PlayerDataContainerClient extends AbstractPersistentData {
 
     @Override
     public String getDisplayName() {
-        return "player_data";
+        return "friendslist:player_data_client";
     }
 
     @Override

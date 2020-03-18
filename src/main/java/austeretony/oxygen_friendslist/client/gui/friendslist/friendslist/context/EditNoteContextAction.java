@@ -25,6 +25,6 @@ public class EditNoteContextAction implements OxygenContextMenuAction {
 
     @Override
     public void execute(GUIBaseElement currElement) {
-        this.section.openEditNoteCallback();
+        this.section.openEditFriendNoteCallback();
     }
 }
